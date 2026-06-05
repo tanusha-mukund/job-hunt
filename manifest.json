@@ -1,0 +1,13 @@
+{
+  "name": "Job Hunt",
+  "short_name": "Job Hunt",
+  "description": "Job search tracker with templates",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
