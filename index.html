@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--border:#2a2a2a;--accent:#c8f060;--accent-dim:rgba(200,240,96,0.12);--accent-text:#0a0a0a;--text:#f0f0f0;--text2:#888;--text3:#555;--red:#ff5a5a;--amber:#ffb347;--blue:#5ab4ff;--green:#5aff9a;--radius:14px;--radius-sm:8px;}
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--border:#2a2a2a;--accent:#c8f060;--accent-dim:rgba(200,240,96,0.12);--accent-text:#0a0a0a;--text:#f0f0f0;--text2:#888;--text3:#555;--red:#ff5a5a;--amber:#ffb347;--blue:#5ab4ff;--radius:14px;--radius-sm:8px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
 #app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;}
@@ -19,9 +19,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .app-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;}
 .header-actions{display:flex;gap:8px;align-items:center;}
-.progress-pill{background:var(--accent-dim);border:1px solid var(--accent);border-radius:999px;padding:4px 12px;font-size:11px;font-family:'DM Mono',monospace;color:var(--accent);}
+.progress-pill{background:var(--accent-dim);border:1px solid var(--accent);border-radius:999px;padding:4px 12px;font-size:11px;font-family:'DM Mono',monospace;color:var(--accent);cursor:pointer;}
 .icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;}
 .icon-btn:active{background:var(--surface2);}
+.sync-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px;}
+.sync-dot.green{background:#5aff9a;}
+.sync-dot.amber{background:var(--amber);}
+.sync-dot.red{background:var(--red);}
+.sync-bar{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:12px;padding:6px 10px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);}
 #tabs{display:flex;gap:6px;padding:0 20px 14px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
 #tabs::-webkit-scrollbar{display:none;}
 .tab-btn{white-space:nowrap;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:none;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;flex-shrink:0;}
@@ -29,7 +34,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 #scroll{flex:1;overflow-y:auto;padding:0 20px 120px;scrollbar-width:none;}
 #scroll::-webkit-scrollbar{display:none;}
 .group-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;margin:20px 0 8px;display:flex;align-items:center;justify-content:space-between;}
-.task{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;cursor:pointer;transition:all .15s;user-select:none;position:relative;}
+.task{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;cursor:pointer;transition:all .15s;user-select:none;}
 .task:active{transform:scale(.98);background:var(--surface2);}
 .task.done{opacity:.4;}
 .task.done .task-name{text-decoration:line-through;}
@@ -52,14 +57,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .edit-task-btn:active{color:var(--text);border-color:var(--text2);}
 .add-task-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px dashed var(--border);border-radius:var(--radius);margin-bottom:8px;cursor:pointer;color:var(--text3);font-size:13px;}
 .add-task-row:active{border-color:var(--accent);color:var(--accent);}
-
-/* BOTTOM STATS */
 #statsbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(10,10,10,.95);border-top:1px solid var(--border);backdrop-filter:blur(12px);padding:12px 20px 28px;display:flex;gap:8px;z-index:50;}
 .stat{flex:1;text-align:center;}
 .stat-val{font-size:18px;font-weight:500;font-family:'DM Mono',monospace;color:var(--accent);}
 .stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:2px;}
-
-/* SHEET */
 #sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;}
 #sheet-overlay.open{opacity:1;pointer-events:all;}
 #sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(105%);width:100%;max-width:480px;background:var(--surface);border-radius:24px 24px 0 0;border-top:1px solid var(--border);z-index:101;padding:0 0 40px;transition:transform .3s cubic-bezier(.32,1,.23,1);max-height:92vh;overflow-y:auto;}
@@ -75,18 +76,19 @@ label.field-label{display:block;font-size:10px;letter-spacing:.08em;text-transfo
 select.field-input option{background:var(--surface2);color:var(--text);}
 textarea.field-input{resize:vertical;font-size:12px;font-family:'DM Mono',monospace;line-height:1.6;min-height:80px;}
 textarea.tmpl-area{min-height:160px;}
-.sheet-actions{display:flex;gap:8px;padding:16px 20px 0;}
-.sheet-btn{flex:1;padding:13px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;}
+.sheet-actions{display:flex;gap:8px;padding:16px 20px 0;flex-wrap:wrap;}
+.sheet-btn{flex:1;padding:13px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;min-width:120px;}
 .sheet-btn:active{transform:scale(.97);}
 .btn-primary{background:var(--accent);color:var(--accent-text);}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
 .btn-danger{background:rgba(255,90,90,.15);color:var(--red);border:1px solid rgba(255,90,90,.3);}
-.placeholders-hint{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px;line-height:1.5;}
 .copy-feedback{text-align:center;font-size:12px;color:var(--accent);font-family:'DM Mono',monospace;padding:8px 0 0;opacity:0;transition:opacity .2s;}
 .copy-feedback.show{opacity:1;}
 .tab-add-btn{font-size:11px;padding:4px 10px;border-radius:999px;border:1px dashed var(--border);background:none;color:var(--text3);cursor:pointer;font-family:'DM Mono',monospace;}
-.tab-add-btn:active{border-color:var(--accent);color:var(--accent);}
-.delete-group-btn{font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,90,90,.2);background:none;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;opacity:.6;}
+.setup-banner{background:rgba(255,179,71,.08);border:1px solid rgba(255,179,71,.3);border-radius:var(--radius);padding:14px;margin-bottom:16px;}
+.setup-banner-title{font-size:13px;font-weight:500;color:var(--amber);margin-bottom:4px;}
+.setup-banner-sub{font-size:12px;color:var(--text2);line-height:1.5;}
+.setup-banner-btn{margin-top:10px;padding:8px 16px;background:var(--amber);color:#000;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
 </style>
 </head>
 <body>
@@ -97,8 +99,13 @@ textarea.tmpl-area{min-height:160px;}
       <div class="header-actions">
         <span class="progress-pill" id="prog-pill">0 / 0</span>
         <button class="icon-btn" onclick="openAddTab()" title="New tab">+</button>
-        <button class="icon-btn" onclick="openExportImport()" title="Export/Import data" style="font-size:13px;">⇅</button>
+        <button class="icon-btn" onclick="openSettings()" title="Settings" style="font-size:13px;">⚙</button>
       </div>
+    </div>
+    <div class="sync-bar" id="sync-bar">
+      <span class="sync-dot amber" id="sync-dot"></span>
+      <span id="sync-label">not connected to GitHub</span>
+      <span style="margin-left:auto;cursor:pointer;color:var(--text2)" onclick="openSettings()">setup →</span>
     </div>
   </div>
   <div id="tabs"></div>
@@ -110,15 +117,11 @@ textarea.tmpl-area{min-height:160px;}
   <div class="stat"><div class="stat-val" id="s-left">0</div><div class="stat-label">Left</div></div>
 </div>
 <div id="sheet-overlay" onclick="closeSheet()"></div>
-<div id="sheet">
-  <div class="sheet-handle"></div>
-  <div id="sheet-inner"></div>
-</div>
+<div id="sheet"><div id="sheet-inner"></div></div>
 
 <script>
-// ─── DEFAULT DATA ────────────────────────────────────────────────
+// ─── DEFAULT DATA ─────────────────────────────────────────────────
 const DEFAULT_TABS = ["Do First","Network","Apply","OPT Clock","Global","Templates"];
-
 const DEFAULT_TASKS = {
   "Do First":[
     {id:"d1",group:"",name:"Follow up with Akshara",badge:"hot",sub:"Ask for agency contacts she promised. Aditi Consulting + Caterpillar leads.",tmpl:"followup_akshara"},
@@ -147,93 +150,158 @@ const DEFAULT_TASKS = {
     {id:"a5",group:"Retail tech teams",name:"Walmart Global Tech",badge:"warm",sub:"careers.walmart.com — filter ML/Data. Strong H1b history."},
     {id:"a6",group:"Retail tech teams",name:"Target — data science/ML",badge:"warm",sub:"Target tech in Minneapolis. jobs.target.com"},
     {id:"a7",group:"LinkedIn post",name:"Study RAG chatbot deeply first",badge:"act",sub:"Know every design decision before posting. Architecture, tradeoffs, results."},
-    {id:"a8",group:"LinkedIn post",name:"Post about RAG/AI chatbot on LinkedIn",badge:"act",sub:"Only after item above. Include demo or diagram. Use AI, RAG, LlamaIndex hashtags.",tmpl:"linkedin_post_rag"},
+    {id:"a8",group:"LinkedIn post",name:"Post about RAG/AI chatbot on LinkedIn",badge:"act",sub:"Only after item above. Include demo or diagram.",tmpl:"linkedin_post_rag"},
   ],
   "OPT Clock":[
     {id:"o1",group:"Academic route",name:"Email UIUC professors for TA/RA",badge:"hot",sub:"Short email — your skills, Data/AI/ML background, availability.",tmpl:"email_ta_ra"},
-    {id:"o2",group:"Academic route",name:"Talk to DSO / international office",badge:"hot",sub:"Ask specifically about stopping 90-day gap clock. CPT, leave of absence, re-enrollment."},
+    {id:"o2",group:"Academic route",name:"Talk to DSO / international office",badge:"hot",sub:"Ask specifically about stopping 90-day gap clock."},
   ],
   "Global":[
-    {id:"g1",group:"Canada — best near-term",name:"Research Canada Express Entry",badge:"act",sub:"Federal Skilled Worker stream. Data/ML qualifies. ~6 months to PR."},
-    {id:"g2",group:"Canada — best near-term",name:"Apply to Canadian Data/AI jobs",badge:"act",sub:"LinkedIn filter: Canada. Shopify, Cohere, RBC, TD, Amazon Canada, Google Waterloo."},
-    {id:"g3",group:"Other countries",name:"Germany — EU Blue Card",badge:"act",sub:"Merit-based, no lottery. PR in 2 years. Berlin/Munich strong ML market."},
-    {id:"g4",group:"Other countries",name:"Singapore — Employment Pass",badge:"act",sub:"GovTech, Sea Group, Grab, ByteDance APAC. Employer sponsors."},
-    {id:"g5",group:"Other countries",name:"UAE / Dubai — no income tax",badge:"act",sub:"G42, Microsoft Gulf, Amazon AWS Dubai. Growing AI sector."},
+    {id:"g1",group:"Canada",name:"Research Canada Express Entry",badge:"act",sub:"Federal Skilled Worker. Data/ML qualifies. ~6 months to PR."},
+    {id:"g2",group:"Canada",name:"Apply to Canadian Data/AI jobs",badge:"act",sub:"Shopify, Cohere, RBC, TD, Amazon Canada, Google Waterloo."},
+    {id:"g3",group:"Other countries",name:"Germany — EU Blue Card",badge:"act",sub:"Merit-based, no lottery. PR in 2 years."},
+    {id:"g4",group:"Other countries",name:"Singapore — Employment Pass",badge:"act",sub:"GovTech, Sea Group, Grab, ByteDance APAC."},
+    {id:"g5",group:"Other countries",name:"UAE / Dubai — no income tax",badge:"act",sub:"G42, Microsoft Gulf, Amazon AWS Dubai."},
   ],
   "Templates":[]
 };
-
 const DEFAULT_TEMPLATES = {
-  followup_akshara:{title:"Follow-up: Akshara",sub:"WhatsApp or iMessage",body:`Hey Akshara! Hope you're doing well 😊 I wanted to follow up on the agency contacts you mentioned — specifically for staffing firms like Aditi Consulting that do W2 + H1b sponsorship. Whenever you get a chance, could you send those over? Really appreciate your help!`},
-  followup_person:{title:"Follow-up: [Name]",sub:"WhatsApp / iMessage — edit [Name] and [Company]",body:`Hey [Name]! Hope all is well. I wanted to circle back — are there any Data/AI/ML openings at [Company] right now? Even if there's nothing active, I'd love to know who to reach out to internally. Thanks so much!`},
+  followup_akshara:{title:"Follow-up: Akshara",sub:"WhatsApp or iMessage",body:`Hey Akshara! Hope you're doing well 😊 I wanted to follow up on the agency contacts you mentioned — specifically staffing firms like Aditi Consulting that do W2 + H1b sponsorship. Whenever you get a chance, could you send those over? Really appreciate your help!`},
+  followup_person:{title:"Follow-up: [Name]",sub:"WhatsApp / iMessage",body:`Hey [Name]! Hope all is well. I wanted to circle back — are there any Data/AI/ML openings at [Company] right now? Even if there's nothing active, I'd love to know who to reach out to internally. Thanks so much!`},
   linkedin_referral:{title:"LinkedIn referral DM",sub:"Customize [Name] and [Company]",body:`Hi [Name], hope you're doing well! I'm currently exploring Data/AI/ML opportunities and noticed you're at [Company]. I'd love to know if there are any open roles in your team or if you'd be comfortable referring me — [Company] is high on my list. Happy to share my resume if helpful. Thanks!`},
-  text_kavana:{title:"Text to Kavana",sub:"Sagarika's friend — Chicago / Florida",body:`Hey Kavana! This is [Your name] — Sagarika's sibling. Hope you're doing well! I'm currently on OPT and actively job searching in Data/AI/ML. I heard you've had great experience in Chicago and Florida — would love to connect and hear your story. Any advice or leads would mean a lot!`},
-  email_professor:{title:"Email to Professor",sub:"For Sachdev, Khandelwal, or any UIUC prof",body:`Subject: Seeking guidance on Data/AI/ML opportunities — [Your Name], MS [Year]\n\nDear Professor [Last Name],\n\nI hope you're doing well. I am [Your Name], a recent MS graduate from UIUC ([Program]). I am currently on OPT and actively seeking roles in Data Science, AI, and Machine Learning.\n\nI would be truly grateful for any guidance — whether that's potential TA/RA openings in your lab, connections to industry contacts, or any advice on navigating the current job market.\n\nThank you so much for your time. I am happy to share my resume or set up a quick call at your convenience.\n\nBest regards,\n[Your Name]\n[Phone] | [LinkedIn URL]`},
-  email_dso:{title:"Email to DSO / International Office",sub:"To stop OPT 90-day gap clock",body:`Subject: Question about OPT Gap Clock — [Your Name], [UIN]\n\nDear [DSO Name / International Student Office],\n\nI am [Your Name], a recent graduate currently on Post-Completion OPT (expiring [date]). I am actively job searching and want to manage my 90-day unemployment gap carefully.\n\nCould you please advise on any options available to me — such as CPT enrollment, a leave of absence, or any other mechanism that might pause or extend my OPT clock?\n\nThank you for your help.\n\nBest,\n[Your Name]\n[Student ID] | [Email] | [Phone]`},
-  email_agency:{title:"Email to staffing agency",sub:"W2 + H1b sponsor agencies (from Akshara)",body:`Subject: OPT Candidate — Data Science / AI / ML — Available Immediately\n\nHi [Recruiter Name],\n\nMy name is [Your Name] and I was referred to you by [Akshara / contact name]. I am a recent MS graduate from UIUC currently on OPT, actively looking for Data Science, Machine Learning, or AI Engineering roles.\n\nI am open to W2 contract positions with H1b sponsorship. My key skills include Python, SQL, Machine Learning, and I recently built an agentic AI/RAG application using LlamaIndex.\n\nI would love to connect — please find my resume attached.\n\nBest regards,\n[Your Name]\n[Phone] | [LinkedIn]`},
-  email_cold_solstice:{title:"Email to Solstice contact (plane)",sub:"Cold follow-up — warm but specific",body:`Subject: Following up — Data/AI/ML roles at Solstice\n\nHi [Name],\n\nIt was great meeting you on the flight! As I mentioned, I'm a recent UIUC MS grad currently on OPT and exploring Data Science and AI/ML opportunities.\n\nI wanted to reach out and ask — are there any relevant openings at Solstice right now? I'm particularly interested in roles involving ML engineering, data science, or AI product work.\n\nI've attached my resume. Would love to reconnect if you have a few minutes!\n\nBest,\n[Your Name]\n[Phone] | [LinkedIn]`},
-  email_ta_ra:{title:"Email to UIUC professor — TA/RA",sub:"To stop OPT gap clock via enrollment",body:`Subject: TA/RA Opportunity Inquiry — [Your Name], MS [Year]\n\nDear Professor [Last Name],\n\nI hope this finds you well. I'm [Your Name], a recent MS graduate from [Program] at UIUC. I'm reaching out to ask if you have any Teaching Assistant or Research Assistant openings in your lab or courses, particularly in areas touching on Data Science, AI, or Machine Learning.\n\nI am currently on OPT and would greatly benefit from a position that also helps manage my visa timeline.\n\nPlease find my resume attached. I would be happy to discuss further at your convenience.\n\nThank you,\n[Your Name]\n[Phone] | [LinkedIn]`},
-  linkedin_post_rag:{title:"LinkedIn post — RAG chatbot",sub:"Only post when you know it inside out",body:`Just shipped something I'm genuinely proud of.\n\nOver the past [X weeks], I built an end-to-end Agentic RAG (Retrieval-Augmented Generation) chatbot using LlamaIndex — here's what I learned:\n\n[Key design decision 1]\n[Key challenge you solved]\n[Interesting result or metric]\n\nThe hardest part was [honest challenge]. The most surprising thing was [insight].\n\nIf you're building with LLMs and want to talk RAG architecture, agentic pipelines, or LlamaIndex — let's connect.\n\nCurrently open to Data/AI/ML roles. H1b sponsorship welcome.\n\n#AI #RAG #LlamaIndex #MachineLearning #OpenToWork #DataScience`},
+  text_kavana:{title:"Text to Kavana",sub:"Sagarika's friend",body:`Hey Kavana! This is [Your name] — Sagarika's sibling. Hope you're doing well! I'm currently on OPT and actively job searching in Data/AI/ML. I heard you've had great experience in Chicago and Florida — would love to connect and hear your story. Any advice or leads would mean a lot!`},
+  email_professor:{title:"Email to Professor",sub:"Sachdev, Khandelwal, or any UIUC prof",body:`Subject: Seeking guidance on Data/AI/ML opportunities — [Your Name], MS [Year]\n\nDear Professor [Last Name],\n\nI hope you're doing well. I am [Your Name], a recent MS graduate from UIUC ([Program]). I am currently on OPT and actively seeking roles in Data Science, AI, and Machine Learning.\n\nI would be truly grateful for any guidance — whether that's potential TA/RA openings, connections to industry contacts, or advice on the job market.\n\nThank you so much for your time.\n\nBest regards,\n[Your Name]\n[Phone] | [LinkedIn URL]`},
+  email_dso:{title:"Email to DSO",sub:"To stop OPT 90-day gap clock",body:`Subject: Question about OPT Gap Clock — [Your Name], [UIN]\n\nDear [DSO Name],\n\nI am [Your Name], a recent graduate on Post-Completion OPT (expiring [date]). I am actively job searching and want to manage my 90-day unemployment gap carefully.\n\nCould you advise on any options — CPT enrollment, leave of absence, or anything that might pause my OPT clock?\n\nThank you.\n\nBest,\n[Your Name]\n[Student ID] | [Phone]`},
+  email_agency:{title:"Email to staffing agency",sub:"W2 + H1b sponsor agencies",body:`Subject: OPT Candidate — Data Science / AI / ML — Available Immediately\n\nHi [Recruiter Name],\n\nMy name is [Your Name] and I was referred to you by [Akshara]. I am a recent MS graduate from UIUC on OPT, looking for Data Science, ML, or AI Engineering roles.\n\nI am open to W2 contract positions with H1b sponsorship. Key skills: Python, SQL, Machine Learning, LlamaIndex/RAG.\n\nResume attached. Happy to connect anytime.\n\nBest,\n[Your Name]\n[Phone] | [LinkedIn]`},
+  email_cold_solstice:{title:"Email to Solstice contact",sub:"Cold follow-up from plane",body:`Subject: Following up — Data/AI/ML roles at Solstice\n\nHi [Name],\n\nIt was great meeting you on the flight! I'm a recent UIUC MS grad on OPT exploring Data Science and AI/ML opportunities.\n\nAre there any relevant openings at Solstice? I'm particularly interested in ML engineering, data science, or AI product work.\n\nResume attached. Would love to reconnect!\n\nBest,\n[Your Name]\n[Phone] | [LinkedIn]`},
+  email_ta_ra:{title:"Email to UIUC prof — TA/RA",sub:"To stop OPT gap via enrollment",body:`Subject: TA/RA Opportunity Inquiry — [Your Name]\n\nDear Professor [Last Name],\n\nI'm [Your Name], a recent MS graduate from UIUC. I'm reaching out to ask if you have any TA or RA openings in your lab, particularly in Data Science, AI, or ML.\n\nI am currently on OPT and would greatly benefit from a position that also helps manage my visa timeline.\n\nResume attached. Happy to discuss at your convenience.\n\nThank you,\n[Your Name]\n[Phone] | [LinkedIn]`},
+  linkedin_post_rag:{title:"LinkedIn post — RAG chatbot",sub:"Only post when you know it inside out",body:`Just shipped something I'm genuinely proud of.\n\nOver the past [X weeks], I built an end-to-end Agentic RAG chatbot using LlamaIndex:\n\n[Key design decision]\n[Key challenge solved]\n[Result or metric]\n\nCurrently open to Data/AI/ML roles. H1b sponsorship welcome.\n\n#AI #RAG #LlamaIndex #MachineLearning #OpenToWork`},
 };
 
-// ─── STATE ───────────────────────────────────────────────────────
-let state = {tabs:[], tasks:{}, templates:{}, done:{}};
+// ─── GITHUB CONFIG ────────────────────────────────────────────────
+const GH_DATA_FILE = 'data.json';
+let ghConfig = {token:'', owner:'', repo:''};
+let ghFileSha = null;
+let syncStatus = 'disconnected'; // disconnected | syncing | synced | error
+
+function loadGhConfig(){
+  try {
+    const c = localStorage.getItem('jh_gh');
+    if(c) ghConfig = JSON.parse(c);
+  } catch(e){}
+}
+function saveGhConfig(){ localStorage.setItem('jh_gh', JSON.stringify(ghConfig)); }
+
+// ─── STATE ────────────────────────────────────────────────────────
+let state = {tabs:[],tasks:{},templates:{},done:{}};
 let activeTab = "Do First";
-let sheetMode = null; // 'template'|'edit-task'|'add-task'|'edit-template'|'add-template'|'add-tab'|'view-template'
 let editTarget = null;
 
-function initState(){
-  try {
-    const saved = localStorage.getItem('jh_state2');
-    if(saved){ state = JSON.parse(saved); }
-    else { resetToDefault(); }
-  } catch(e){ resetToDefault(); }
-}
 function resetToDefault(){
   state = {
-    tabs: [...DEFAULT_TABS],
-    tasks: JSON.parse(JSON.stringify(DEFAULT_TASKS)),
-    templates: JSON.parse(JSON.stringify(DEFAULT_TEMPLATES)),
-    done: {}
+    tabs:[...DEFAULT_TABS],
+    tasks:JSON.parse(JSON.stringify(DEFAULT_TASKS)),
+    templates:JSON.parse(JSON.stringify(DEFAULT_TEMPLATES)),
+    done:{}
   };
-  save();
 }
-function save(){
-  try { localStorage.setItem('jh_state2', JSON.stringify(state)); } catch(e){}
+function saveLocal(){ try{ localStorage.setItem('jh_state3', JSON.stringify(state)); }catch(e){} }
+function loadLocal(){
+  try {
+    const s = localStorage.getItem('jh_state3');
+    if(s){ state = JSON.parse(s); return true; }
+  } catch(e){}
+  return false;
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+
+// ─── GITHUB SYNC ──────────────────────────────────────────────────
+function setSyncStatus(status, msg){
+  syncStatus = status;
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + {synced:'green',syncing:'amber',error:'red',disconnected:'amber'}[status];
+  label.textContent = msg;
 }
 
-// ─── ID GEN ──────────────────────────────────────────────────────
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
-
-// ─── STATS ───────────────────────────────────────────────────────
-function getAllTasks(){
-  return Object.values(state.tasks).flat().filter(t=>t&&t.id);
+async function ghGet(){
+  if(!ghConfig.token) return null;
+  try {
+    setSyncStatus('syncing','loading from GitHub...');
+    const r = await fetch(`https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${GH_DATA_FILE}`,{
+      headers:{'Authorization':'token '+ghConfig.token,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(r.status===404){ setSyncStatus('synced','GitHub connected — first save'); return null; }
+    if(!r.ok){ setSyncStatus('error','GitHub error '+r.status); return null; }
+    const json = await r.json();
+    ghFileSha = json.sha;
+    const decoded = JSON.parse(atob(json.content.replace(/\n/g,'')));
+    setSyncStatus('synced','synced · '+new Date().toLocaleTimeString());
+    return decoded;
+  } catch(e){ setSyncStatus('error','sync failed'); return null; }
 }
+
+async function ghPut(data){
+  if(!ghConfig.token) return;
+  try {
+    setSyncStatus('syncing','saving...');
+    const body = {
+      message:'update job hunt data',
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(data)))),
+      ...(ghFileSha?{sha:ghFileSha}:{})
+    };
+    const r = await fetch(`https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${GH_DATA_FILE}`,{
+      method:'PUT',
+      headers:{'Authorization':'token '+ghConfig.token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!r.ok){ setSyncStatus('error','save failed '+r.status); return; }
+    const json = await r.json();
+    ghFileSha = json.content.sha;
+    setSyncStatus('synced','synced · '+new Date().toLocaleTimeString());
+  } catch(e){ setSyncStatus('error','save failed'); }
+}
+
+async function save(){
+  saveLocal();
+  await ghPut(state);
+}
+
+async function loadData(){
+  loadGhConfig();
+  if(ghConfig.token && ghConfig.owner && ghConfig.repo){
+    const remote = await ghGet();
+    if(remote && remote.tabs){
+      state = remote;
+      saveLocal();
+      return;
+    }
+  } else {
+    setSyncStatus('disconnected','not connected — tap setup →');
+  }
+  if(!loadLocal()) resetToDefault();
+}
+
+// ─── STATS ────────────────────────────────────────────────────────
+function getAllTasks(){ return Object.values(state.tasks).flat().filter(t=>t&&t.id); }
 function updateStats(){
   const all = getAllTasks();
   const doneCount = all.filter(t=>state.done[t.id]).length;
-  const hotLeft = all.filter(t=>t.badge==='hot'&&!state.done[t.id]).length;
-  const left = all.length - doneCount;
   document.getElementById('prog-pill').textContent = doneCount+' / '+all.length;
   document.getElementById('s-done').textContent = doneCount;
-  document.getElementById('s-hot').textContent = hotLeft;
-  document.getElementById('s-left').textContent = left;
+  document.getElementById('s-hot').textContent = all.filter(t=>t.badge==='hot'&&!state.done[t.id]).length;
+  document.getElementById('s-left').textContent = all.length - doneCount;
 }
 
-// ─── RENDER TABS ─────────────────────────────────────────────────
+// ─── RENDER ───────────────────────────────────────────────────────
 function renderTabs(){
-  const wrap = document.getElementById('tabs');
-  wrap.innerHTML = state.tabs.map((t,i)=>
+  document.getElementById('tabs').innerHTML = state.tabs.map((t,i)=>
     `<button class="tab-btn${t===activeTab?' active':''}" onclick="switchTab(${i})">${t}</button>`
   ).join('');
 }
-
-// ─── RENDER SCROLL ───────────────────────────────────────────────
 function badgeHTML(b){
   if(!b) return '';
-  const cls={hot:'b-hot',warm:'b-warm',act:'b-act'}[b]||'b-act';
-  const lbl={hot:'do first',warm:'this week',act:'active'}[b]||b;
-  return `<span class="badge ${cls}">${lbl}</span>`;
+  return `<span class="badge ${{hot:'b-hot',warm:'b-warm',act:'b-act'}[b]||'b-act'}">${{hot:'do first',warm:'this week',act:'active'}[b]||b}</span>`;
 }
 function taskHTML(t){
   const isDone = state.done[t.id];
@@ -252,939 +320,270 @@ function taskHTML(t){
 function renderScroll(){
   const wrap = document.getElementById('scroll');
   if(activeTab==='Templates'){
-    const tmpls = Object.entries(state.templates);
-    wrap.innerHTML = `
-      ${tmpls.map(([key,tmpl])=>`
-        <div class="task" onclick="openViewTemplate(null,'${key}')">
-          <div class="check" style="border-color:transparent;color:var(--accent);font-size:16px;">📋</div>
-          <div class="task-content">
-            <div class="task-top"><span class="task-name">${esc(tmpl.title)}</span></div>
-            <div class="task-sub">${esc(tmpl.sub)}</div>
-            <div class="task-actions">
-              <button class="edit-task-btn" onclick="openEditTemplate(event,'${key}')">✎ edit</button>
-              <button class="edit-task-btn" style="color:var(--red);border-color:rgba(255,90,90,.2)" onclick="deleteTemplate(event,'${key}')">✕ delete</button>
-            </div>
+    wrap.innerHTML = Object.entries(state.templates).map(([key,tmpl])=>`
+      <div class="task" onclick="openViewTemplate(null,'${key}')">
+        <div class="check" style="border-color:transparent;font-size:16px;">📋</div>
+        <div class="task-content">
+          <div class="task-top"><span class="task-name">${esc(tmpl.title)}</span></div>
+          <div class="task-sub">${esc(tmpl.sub)}</div>
+          <div class="task-actions">
+            <button class="edit-task-btn" onclick="openEditTemplate(event,'${key}')">✎ edit</button>
+            <button class="edit-task-btn" style="color:var(--red)" onclick="deleteTemplate(event,'${key}')">✕ delete</button>
           </div>
-        </div>`).join('')}
-      <div class="add-task-row" onclick="openAddTemplate()">+ add new template</div>`;
+        </div>
+      </div>`).join('')
+    +`<div class="add-task-row" onclick="openAddTemplate()">+ add new template</div>`;
     return;
   }
   const tasks = state.tasks[activeTab]||[];
-  const groups = [];
-  const groupMap = {};
-  tasks.forEach(t=>{
-    const g = t.group||'';
-    if(!groupMap[g]){ groupMap[g]=[]; groups.push(g); }
-    groupMap[g].push(t);
-  });
+  const groups=[], groupMap={};
+  tasks.forEach(t=>{ const g=t.group||''; if(!groupMap[g]){groupMap[g]=[];groups.push(g);} groupMap[g].push(t); });
   wrap.innerHTML = groups.map(g=>`
-    <div class="group-label">
-      <span>${g||'Tasks'}</span>
-      <button class="tab-add-btn" onclick="openAddTaskGroup(this)" data-group="${g}">+ add</button>
+    <div class="group-label"><span>${g||'Tasks'}</span>
+      <button class="tab-add-btn" data-group="${esc(g)}" onclick="openAddTaskFromBtn(this)">+ add</button>
     </div>
     ${groupMap[g].map(taskHTML).join('')}
   `).join('') + `<div class="add-task-row" onclick="openAddTask('')">+ add task / new section</div>`;
 }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ─── TOGGLE ──────────────────────────────────────────────────────
-function toggleTask(id){
+// ─── ACTIONS ──────────────────────────────────────────────────────
+async function toggleTask(id){
   state.done[id] = !state.done[id];
-  save(); renderScroll(); updateStats();
+  renderScroll(); updateStats();
+  await save();
 }
-
-// ─── SWITCH TAB ──────────────────────────────────────────────────
 function switchTab(idx){
-  activeTab = typeof idx === 'number' ? state.tabs[idx] : idx;
+  activeTab = typeof idx==='number' ? state.tabs[idx] : idx;
   renderTabs(); renderScroll();
 }
+function openAddTaskFromBtn(btn){ openAddTask(btn.getAttribute('data-group')||''); }
 
-// ─── SHEET HELPERS ───────────────────────────────────────────────
+// ─── SHEET ────────────────────────────────────────────────────────
 function openSheet(html){
-  document.getElementById('sheet-inner').innerHTML = html;
+  document.getElementById('sheet-inner').innerHTML = '<div class="sheet-handle"></div>'+html;
   document.getElementById('sheet-overlay').classList.add('open');
   document.getElementById('sheet').classList.add('open');
-  setTimeout(()=>{
-    const inp = document.querySelector('#sheet-inner input, #sheet-inner textarea');
-    // don't auto-focus on template view
-    if(inp && sheetMode !== 'view-template') inp.focus();
-  },350);
 }
-function closeSheet(){ 
+function closeSheet(){
   document.getElementById('sheet-overlay').classList.remove('open');
   document.getElementById('sheet').classList.remove('open');
 }
+let _sy=0;
+document.getElementById('sheet').addEventListener('touchstart',e=>{_sy=e.touches[0].clientY;});
+document.getElementById('sheet').addEventListener('touchend',e=>{ if(e.changedTouches[0].clientY-_sy>80) closeSheet(); });
 
-// ─── VIEW TEMPLATE ───────────────────────────────────────────────
-function openViewTemplate(e, key){
+// ─── TEMPLATE VIEW ────────────────────────────────────────────────
+function openViewTemplate(e,key){
   if(e) e.stopPropagation();
-  const tmpl = state.templates[key];
-  if(!tmpl) return;
-  sheetMode = 'view-template';
-  editTarget = key;
-  const placeholders = [...new Set((tmpl.body.match(/\[[^\]]+\]/g)||[]))];
-  const fillFields = placeholders.map((p,i)=>
-    `<label class="field-label">${p.replace(/[\[\]]/g,'')}</label>
-     <input class="field-input" id="fill_${i}" placeholder="Type value for ${p}" oninput="updatePreview()">`
-  ).join('');
+  const tmpl = state.templates[key]; if(!tmpl) return;
+  const phs = [...new Set((tmpl.body.match(/\[[^\]]+\]/g)||[]))];
+  const fills = phs.map((p,i)=>`<label class="field-label">${p.replace(/[\[\]]/g,'')}</label><input class="field-input" id="fill_${i}" placeholder="Value for ${p}" oninput="updatePreview()">`).join('');
   openSheet(`
-    <div class="sheet-handle"></div>
     <div class="sheet-header"><div class="sheet-title">${esc(tmpl.title)}</div><div class="sheet-sub">${esc(tmpl.sub)}</div></div>
     <div class="sheet-body">
-      ${placeholders.length?`<label class="field-label">Fill in placeholders</label>${fillFields}<label class="field-label" style="margin-top:16px">Preview</label>`:'<label class="field-label">Message</label>'}
+      ${phs.length?fills+'<label class="field-label" style="margin-top:16px">Preview</label>':'<label class="field-label">Message</label>'}
       <textarea class="field-input tmpl-area" id="tmpl_preview" readonly>${esc(tmpl.body)}</textarea>
-      <div class="copy-feedback" id="copy-fb">Copied to clipboard!</div>
+      <div class="copy-feedback" id="copy-fb">Copied!</div>
     </div>
     <div class="sheet-actions">
       <button class="sheet-btn btn-primary" onclick="copyPreview()">Copy message</button>
       <button class="sheet-btn btn-secondary" onclick="closeSheet()">Close</button>
     </div>`);
-  window._currentTmplBody = tmpl.body;
-  window._currentPlaceholders = placeholders;
+  window._tmplBody = tmpl.body; window._tmplPhs = phs;
 }
 function updatePreview(){
-  let body = window._currentTmplBody;
-  (window._currentPlaceholders||[]).forEach((p,i)=>{
-    const val = document.getElementById('fill_'+i)?.value;
-    if(val) body = body.replaceAll(p, val);
-  });
-  document.getElementById('tmpl_preview').value = body;
+  let body=window._tmplBody;
+  (window._tmplPhs||[]).forEach((p,i)=>{ const v=document.getElementById('fill_'+i)?.value; if(v) body=body.replaceAll(p,v); });
+  document.getElementById('tmpl_preview').value=body;
 }
 function copyPreview(){
-  const text = document.getElementById('tmpl_preview').value;
-  navigator.clipboard?.writeText(text).catch(()=>{});
-  const ta = document.createElement('textarea');
-  ta.value=text; document.body.appendChild(ta); ta.select();
+  const text=document.getElementById('tmpl_preview').value;
+  try{ navigator.clipboard.writeText(text); }catch(e){}
+  const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
   try{document.execCommand('copy');}catch(e){}
   document.body.removeChild(ta);
-  const fb = document.getElementById('copy-fb');
-  fb.classList.add('show');
-  setTimeout(()=>fb.classList.remove('show'),2000);
+  const fb=document.getElementById('copy-fb'); fb.classList.add('show'); setTimeout(()=>fb.classList.remove('show'),2000);
 }
 
-// ─── EDIT TASK ───────────────────────────────────────────────────
-function openEditTask(e, id){
+// ─── EDIT TASK ────────────────────────────────────────────────────
+function openEditTask(e,id){
   if(e) e.stopPropagation();
-  const t = getAllTasks().find(x=>x.id===id);
-  if(!t) return;
-  sheetMode='edit-task'; editTarget=id;
-  const tmplOptions = ['','...none',...Object.keys(state.templates)].map(k=>
-    `<option value="${k}" ${t.tmpl===k?'selected':''}>${k||'— no template —'}</option>`).join('');
+  const t=getAllTasks().find(x=>x.id===id); if(!t) return;
+  editTarget=id;
+  const tmplOpts=['','...none',...Object.keys(state.templates)].map(k=>`<option value="${k}" ${t.tmpl===k?'selected':''}>${k||'— no template —'}</option>`).join('');
   openSheet(`
-    <div class="sheet-handle"></div>
     <div class="sheet-header"><div class="sheet-title">Edit task</div></div>
     <div class="sheet-body">
-      <label class="field-label">Task name</label>
-      <input class="field-input" id="e_name" value="${esc(t.name)}">
-      <label class="field-label">Details / sub-text</label>
-      <textarea class="field-input" id="e_sub">${esc(t.sub||'')}</textarea>
+      <label class="field-label">Name</label><input class="field-input" id="e_name" value="${esc(t.name)}">
+      <label class="field-label">Details</label><textarea class="field-input" id="e_sub">${esc(t.sub||'')}</textarea>
       <label class="field-label">Priority</label>
       <select class="field-input" id="e_badge">
-        <option value="hot" ${t.badge==='hot'?'selected':''}>🔴 do first (urgent)</option>
+        <option value="hot" ${t.badge==='hot'?'selected':''}>🔴 do first</option>
         <option value="warm" ${t.badge==='warm'?'selected':''}>🟡 this week</option>
         <option value="act" ${t.badge==='act'?'selected':''}>🔵 active</option>
         <option value="" ${!t.badge?'selected':''}>⚪ none</option>
       </select>
-      <label class="field-label">Section / group</label>
-      <input class="field-input" id="e_group" value="${esc(t.group||'')}">
-      <label class="field-label">Template (optional)</label>
-      <select class="field-input" id="e_tmpl">${tmplOptions}</select>
+      <label class="field-label">Section</label><input class="field-input" id="e_group" value="${esc(t.group||'')}">
+      <label class="field-label">Template</label><select class="field-input" id="e_tmpl">${tmplOpts}</select>
     </div>
     <div class="sheet-actions">
       <button class="sheet-btn btn-primary" onclick="saveEditTask()">Save</button>
       <button class="sheet-btn btn-danger" onclick="deleteTask('${id}')">Delete</button>
     </div>`);
 }
-function saveEditTask(){
-  const tasks = state.tasks[activeTab];
-  const t = tasks.find(x=>x.id===editTarget);
-  if(!t) return;
-  t.name = document.getElementById('e_name').value.trim();
-  t.sub = document.getElementById('e_sub').value.trim();
-  t.badge = document.getElementById('e_badge').value;
-  t.group = document.getElementById('e_group').value.trim();
-  const tmplVal = document.getElementById('e_tmpl').value;
-  t.tmpl = (tmplVal && tmplVal !== '...none') ? tmplVal : undefined;
-  save(); closeSheet(); renderScroll(); updateStats();
+async function saveEditTask(){
+  const tasks=state.tasks[activeTab]; const t=tasks.find(x=>x.id===editTarget); if(!t) return;
+  t.name=document.getElementById('e_name').value.trim();
+  t.sub=document.getElementById('e_sub').value.trim();
+  t.badge=document.getElementById('e_badge').value;
+  t.group=document.getElementById('e_group').value.trim();
+  const tv=document.getElementById('e_tmpl').value;
+  t.tmpl=(tv&&tv!=='...none')?tv:undefined;
+  closeSheet(); renderScroll(); updateStats(); await save();
 }
-function deleteTask(id){
+async function deleteTask(id){
   if(!confirm('Delete this task?')) return;
-  state.tasks[activeTab] = (state.tasks[activeTab]||[]).filter(t=>t.id!==id);
+  state.tasks[activeTab]=(state.tasks[activeTab]||[]).filter(t=>t.id!==id);
   delete state.done[id];
-  save(); closeSheet(); renderScroll(); updateStats();
+  closeSheet(); renderScroll(); updateStats(); await save();
 }
 
-// ─── ADD TASK ────────────────────────────────────────────────────
-function openAddTaskGroup(btn){
-  openAddTask(btn.getAttribute('data-group')||'');
-}
+// ─── ADD TASK ─────────────────────────────────────────────────────
 function openAddTask(group){
-  sheetMode='add-task'; editTarget=group;
-  const tmplOptions = ['','...none',...Object.keys(state.templates)].map(k=>
-    `<option value="${k}">${k||'— no template —'}</option>`).join('');
+  const tmplOpts=['','...none',...Object.keys(state.templates)].map(k=>`<option value="${k}">${k||'— no template —'}</option>`).join('');
   openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">Add task</div><div class="sheet-sub">to ${activeTab}</div></div>
+    <div class="sheet-header"><div class="sheet-title">Add task</div><div class="sheet-sub">to ${esc(activeTab)}</div></div>
     <div class="sheet-body">
-      <label class="field-label">Task name</label>
-      <input class="field-input" id="a_name" placeholder="e.g. Email Walmart recruiter">
-      <label class="field-label">Details</label>
-      <textarea class="field-input" id="a_sub" placeholder="Any notes..."></textarea>
+      <label class="field-label">Name</label><input class="field-input" id="a_name" placeholder="e.g. Email Walmart recruiter">
+      <label class="field-label">Details</label><textarea class="field-input" id="a_sub" placeholder="Notes..."></textarea>
       <label class="field-label">Priority</label>
       <select class="field-input" id="a_badge">
-        <option value="hot">🔴 do first (urgent)</option>
+        <option value="hot">🔴 do first</option>
         <option value="warm" selected>🟡 this week</option>
         <option value="act">🔵 active</option>
         <option value="">⚪ none</option>
       </select>
-      <label class="field-label">Section / group (leave blank for same group)</label>
-      <input class="field-input" id="a_group" value="${esc(group)}">
-      <label class="field-label">Template (optional)</label>
-      <select class="field-input" id="a_tmpl">${tmplOptions}</select>
+      <label class="field-label">Section</label><input class="field-input" id="a_group" value="${esc(group)}">
+      <label class="field-label">Template</label><select class="field-input" id="a_tmpl">${tmplOpts}</select>
     </div>
     <div class="sheet-actions">
       <button class="sheet-btn btn-primary" onclick="saveAddTask()">Add task</button>
       <button class="sheet-btn btn-secondary" onclick="closeSheet()">Cancel</button>
     </div>`);
 }
-function saveAddTask(){
-  const name = document.getElementById('a_name').value.trim();
-  if(!name) return;
-  const tmplVal = document.getElementById('a_tmpl').value;
-  const t = {
-    id: uid(),
-    group: document.getElementById('a_group').value.trim(),
-    name,
-    badge: document.getElementById('a_badge').value,
-    sub: document.getElementById('a_sub').value.trim(),
-    tmpl: (tmplVal && tmplVal !== '...none') ? tmplVal : undefined
-  };
+async function saveAddTask(){
+  const name=document.getElementById('a_name').value.trim(); if(!name) return;
+  const tv=document.getElementById('a_tmpl').value;
+  const t={id:uid(),group:document.getElementById('a_group').value.trim(),name,badge:document.getElementById('a_badge').value,sub:document.getElementById('a_sub').value.trim(),tmpl:(tv&&tv!=='...none')?tv:undefined};
   if(!state.tasks[activeTab]) state.tasks[activeTab]=[];
   state.tasks[activeTab].push(t);
-  save(); closeSheet(); renderScroll(); updateStats();
+  closeSheet(); renderScroll(); updateStats(); await save();
 }
 
-// ─── ADD TAB ─────────────────────────────────────────────────────
+// ─── ADD TAB ──────────────────────────────────────────────────────
 function openAddTab(){
-  sheetMode='add-tab';
   openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">New tab</div><div class="sheet-sub">Creates a new section in your tracker</div></div>
+    <div class="sheet-header"><div class="sheet-title">New tab</div></div>
     <div class="sheet-body">
-      <label class="field-label">Tab name</label>
-      <input class="field-input" id="tab_name" placeholder="e.g. Interviews, Follow-ups...">
+      <label class="field-label">Tab name</label><input class="field-input" id="tab_name" placeholder="e.g. Interviews...">
     </div>
     <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="saveAddTab()">Create tab</button>
+      <button class="sheet-btn btn-primary" onclick="saveAddTab()">Create</button>
       <button class="sheet-btn btn-secondary" onclick="closeSheet()">Cancel</button>
     </div>`);
 }
-function saveAddTab(){
-  const name = document.getElementById('tab_name').value.trim();
-  if(!name || state.tabs.includes(name)) return;
-  state.tabs.push(name);
-  state.tasks[name] = [];
-  save(); closeSheet(); renderTabs(); switchTab(name);
+async function saveAddTab(){
+  const name=document.getElementById('tab_name').value.trim(); if(!name||state.tabs.includes(name)) return;
+  state.tabs.push(name); state.tasks[name]=[];
+  closeSheet(); renderTabs(); switchTab(name); await save();
 }
 
-// ─── TEMPLATES CRUD ──────────────────────────────────────────────
+// ─── TEMPLATES CRUD ───────────────────────────────────────────────
 function openAddTemplate(){
-  sheetMode='add-template';
   openSheet(`
-    <div class="sheet-handle"></div>
     <div class="sheet-header"><div class="sheet-title">New template</div><div class="sheet-sub">Use [Brackets] for fill-in parts</div></div>
     <div class="sheet-body">
-      <label class="field-label">Template name</label>
-      <input class="field-input" id="nt_title" placeholder="e.g. LinkedIn cold DM">
-      <label class="field-label">Description</label>
-      <input class="field-input" id="nt_sub" placeholder="e.g. For recruiters at target companies">
-      <label class="field-label">Message body — use [Name], [Company] etc.</label>
-      <textarea class="field-input tmpl-area" id="nt_body" placeholder="Hi [Name], I saw you work at [Company]..."></textarea>
+      <label class="field-label">Name</label><input class="field-input" id="nt_title" placeholder="e.g. LinkedIn cold DM">
+      <label class="field-label">Description</label><input class="field-input" id="nt_sub" placeholder="When to use this">
+      <label class="field-label">Body — use [Name], [Company] etc.</label>
+      <textarea class="field-input tmpl-area" id="nt_body" placeholder="Hi [Name]..."></textarea>
     </div>
     <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="saveAddTemplate()">Save template</button>
+      <button class="sheet-btn btn-primary" onclick="saveAddTemplate()">Save</button>
       <button class="sheet-btn btn-secondary" onclick="closeSheet()">Cancel</button>
     </div>`);
 }
-function saveAddTemplate(){
-  const title = document.getElementById('nt_title').value.trim();
-  if(!title) return;
-  const key = 'custom_'+uid();
-  state.templates[key] = {
-    title,
-    sub: document.getElementById('nt_sub').value.trim(),
-    body: document.getElementById('nt_body').value.trim()
-  };
-  save(); closeSheet(); renderScroll();
+async function saveAddTemplate(){
+  const title=document.getElementById('nt_title').value.trim(); if(!title) return;
+  state.templates['custom_'+uid()]={title,sub:document.getElementById('nt_sub').value.trim(),body:document.getElementById('nt_body').value.trim()};
+  closeSheet(); renderScroll(); await save();
 }
-function openEditTemplate(e, key){
+function openEditTemplate(e,key){
   if(e) e.stopPropagation();
-  const tmpl = state.templates[key];
-  if(!tmpl) return;
-  sheetMode='edit-template'; editTarget=key;
+  const tmpl=state.templates[key]; if(!tmpl) return;
+  editTarget=key;
   openSheet(`
-    <div class="sheet-handle"></div>
     <div class="sheet-header"><div class="sheet-title">Edit template</div></div>
     <div class="sheet-body">
-      <label class="field-label">Name</label>
-      <input class="field-input" id="et_title" value="${esc(tmpl.title)}">
-      <label class="field-label">Description</label>
-      <input class="field-input" id="et_sub" value="${esc(tmpl.sub||'')}">
-      <label class="field-label">Body — use [Name], [Company] etc.</label>
-      <textarea class="field-input tmpl-area" id="et_body">${esc(tmpl.body||'')}</textarea>
+      <label class="field-label">Name</label><input class="field-input" id="et_title" value="${esc(tmpl.title)}">
+      <label class="field-label">Description</label><input class="field-input" id="et_sub" value="${esc(tmpl.sub||'')}">
+      <label class="field-label">Body</label><textarea class="field-input tmpl-area" id="et_body">${esc(tmpl.body||'')}</textarea>
     </div>
     <div class="sheet-actions">
       <button class="sheet-btn btn-primary" onclick="saveEditTemplate()">Save</button>
       <button class="sheet-btn btn-danger" onclick="deleteTemplate(null,'${key}')">Delete</button>
     </div>`);
 }
-function saveEditTemplate(){
-  state.templates[editTarget] = {
-    title: document.getElementById('et_title').value.trim(),
-    sub: document.getElementById('et_sub').value.trim(),
-    body: document.getElementById('et_body').value.trim()
-  };
-  save(); closeSheet(); renderScroll();
+async function saveEditTemplate(){
+  state.templates[editTarget]={title:document.getElementById('et_title').value.trim(),sub:document.getElementById('et_sub').value.trim(),body:document.getElementById('et_body').value.trim()};
+  closeSheet(); renderScroll(); await save();
 }
-function deleteTemplate(e, key){
+async function deleteTemplate(e,key){
   if(e) e.stopPropagation();
   if(!confirm('Delete this template?')) return;
   delete state.templates[key];
-  save(); closeSheet(); renderScroll();
+  closeSheet(); renderScroll(); await save();
 }
 
-
-// ─── EXPORT / IMPORT ─────────────────────────────────────────────
-function openExportImport(){
-  const exported = JSON.stringify(state);
+// ─── SETTINGS / GITHUB SETUP ──────────────────────────────────────
+function openSettings(){
   openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">Sync data</div><div class="sheet-sub">Copy your data to move it to another device</div></div>
+    <div class="sheet-header"><div class="sheet-title">GitHub Sync Setup</div><div class="sheet-sub">Enter your details once — syncs forever after</div></div>
     <div class="sheet-body">
-      <label class="field-label">Your data (copy this, paste on other device)</label>
-      <textarea class="field-input tmpl-area" id="exp_data" style="font-size:10px;min-height:120px;">${exported}</textarea>
-      <div class="copy-feedback" id="exp-fb">Copied!</div>
-      <div style="height:16px;"></div>
-      <label class="field-label">Import from another device — paste data here</label>
-      <textarea class="field-input" id="imp_data" rows="3" placeholder="Paste exported data here..."></textarea>
-    </div>
-    <div class="sheet-actions" style="flex-wrap:wrap;gap:8px;">
-      <button class="sheet-btn btn-primary" onclick="copyExport()">Copy my data</button>
-      <button class="sheet-btn btn-secondary" onclick="doImport()">Import pasted data</button>
-    </div>`);
-}
-function copyExport(){
-  const text = document.getElementById('exp_data').value;
-  navigator.clipboard?.writeText(text).catch(()=>{});
-  const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);
-  const fb=document.getElementById('exp-fb');
-  fb.classList.add('show');
-  setTimeout(()=>fb.classList.remove('show'),2000);
-}
-function doImport(){
-  try {
-    const raw = document.getElementById('imp_data').value.trim();
-    if(!raw) return;
-    const parsed = JSON.parse(raw);
-    if(!parsed.tabs || !parsed.tasks) { alert('Invalid data — make sure you copied it correctly.'); return; }
-    state = parsed;
-    save();
-    closeSheet();
-    renderTabs(); renderScroll(); updateStats();
-    alert('Imported! Your data is now synced.');
-  } catch(e) { alert('Could not import — check the pasted data.'); }
-}
-
-// ─── SWIPE DOWN TO CLOSE SHEET ───────────────────────────────────
-let _sy=0;
-document.getElementById('sheet').addEventListener('touchstart',e=>{_sy=e.touches[0].clientY;});
-document.getElementById('sheet').addEventListener('touchend',e=>{if(e.changedTouches[0].clientY-_sy>80)closeSheet();});
-
-// ─── BOOT ────────────────────────────────────────────────────────
-initState();
-if(!state.tabs||!state.tabs.length) resetToDefault();
-if(!state.tasks) state.tasks={};
-if(!state.templates) state.templates={};
-if(!state.done) state.done={};
-renderTabs(); renderScroll(); updateStats();
-</script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}<\/script>
-</body>
-</html>.task.done .check{background:var(--accent);border-color:var(--accent);}
-.check-svg{width:10px;height:10px;opacity:0;transition:opacity .15s;}
-.task.done .check-svg{opacity:1;}
-.task-content{flex:1;min-width:0;}
-.task-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;}
-.task-name{font-size:14px;font-weight:500;color:var(--text);line-height:1.3;}
-.badge{font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px;font-family:'DM Mono',monospace;flex-shrink:0;}
-.b-hot{background:rgba(255,90,90,.15);color:var(--red);border:1px solid rgba(255,90,90,.3);}
-.b-warm{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid rgba(255,179,71,.25);}
-.b-act{background:rgba(90,180,255,.12);color:var(--blue);border:1px solid rgba(90,180,255,.25);}
-.task-sub{font-size:12px;color:var(--text2);line-height:1.5;}
-.task-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
-.tmpl-btn{display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 9px;font-size:11px;color:var(--text2);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
-.tmpl-btn:active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);}
-.edit-task-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 9px;font-size:11px;color:var(--text3);cursor:pointer;font-family:'DM Mono',monospace;}
-.edit-task-btn:active{color:var(--text);border-color:var(--text2);}
-.add-task-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px dashed var(--border);border-radius:var(--radius);margin-bottom:8px;cursor:pointer;color:var(--text3);font-size:13px;}
-.add-task-row:active{border-color:var(--accent);color:var(--accent);}
-
-/* BOTTOM STATS */
-#statsbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(10,10,10,.95);border-top:1px solid var(--border);backdrop-filter:blur(12px);padding:12px 20px 28px;display:flex;gap:8px;z-index:50;}
-.stat{flex:1;text-align:center;}
-.stat-val{font-size:18px;font-weight:500;font-family:'DM Mono',monospace;color:var(--accent);}
-.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:2px;}
-
-/* SHEET */
-#sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;}
-#sheet-overlay.open{opacity:1;pointer-events:all;}
-#sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(105%);width:100%;max-width:480px;background:var(--surface);border-radius:24px 24px 0 0;border-top:1px solid var(--border);z-index:101;padding:0 0 40px;transition:transform .3s cubic-bezier(.32,1,.23,1);max-height:92vh;overflow-y:auto;}
-#sheet.open{transform:translateX(-50%) translateY(0);}
-.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
-.sheet-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);}
-.sheet-title{font-size:16px;font-weight:500;margin-bottom:2px;}
-.sheet-sub{font-size:12px;color:var(--text2);}
-.sheet-body{padding:16px 20px 0;}
-label.field-label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:6px;margin-top:14px;}
-.field-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;}
-.field-input:focus{border-color:var(--accent);}
-select.field-input option{background:var(--surface2);color:var(--text);}
-textarea.field-input{resize:vertical;font-size:12px;font-family:'DM Mono',monospace;line-height:1.6;min-height:80px;}
-textarea.tmpl-area{min-height:160px;}
-.sheet-actions{display:flex;gap:8px;padding:16px 20px 0;}
-.sheet-btn{flex:1;padding:13px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;}
-.sheet-btn:active{transform:scale(.97);}
-.btn-primary{background:var(--accent);color:var(--accent-text);}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
-.btn-danger{background:rgba(255,90,90,.15);color:var(--red);border:1px solid rgba(255,90,90,.3);}
-.placeholders-hint{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px;line-height:1.5;}
-.copy-feedback{text-align:center;font-size:12px;color:var(--accent);font-family:'DM Mono',monospace;padding:8px 0 0;opacity:0;transition:opacity .2s;}
-.copy-feedback.show{opacity:1;}
-.tab-add-btn{font-size:11px;padding:4px 10px;border-radius:999px;border:1px dashed var(--border);background:none;color:var(--text3);cursor:pointer;font-family:'DM Mono',monospace;}
-.tab-add-btn:active{border-color:var(--accent);color:var(--accent);}
-.delete-group-btn{font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,90,90,.2);background:none;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;opacity:.6;}
-</style>
-</head>
-<body>
-<div id="app">
-  <div id="header">
-    <div class="header-row">
-      <span class="app-title">Job Hunt</span>
-      <div class="header-actions">
-        <span class="progress-pill" id="prog-pill">0 / 0</span>
-        <button class="icon-btn" onclick="openAddTab()" title="New tab">+</button>
-        <button class="icon-btn" onclick="openExportImport()" title="Export/Import data" style="font-size:13px;">⇅</button>
+      <label class="field-label">GitHub username</label>
+      <input class="field-input" id="gh_owner" value="${esc(ghConfig.owner)}" placeholder="e.g. tanusha-mukund">
+      <label class="field-label">Repository name</label>
+      <input class="field-input" id="gh_repo" value="${esc(ghConfig.repo)}" placeholder="e.g. job-hunt">
+      <label class="field-label">Personal Access Token (ghp_...)</label>
+      <input class="field-input" id="gh_token" type="password" value="${esc(ghConfig.token)}" placeholder="ghp_xxxxxxxxxxxx">
+      <div style="margin-top:10px;font-size:11px;color:var(--text3);line-height:1.6;font-family:'DM Mono',monospace;">
+        Token lives only on this device in localStorage.<br>
+        Never shared or sent anywhere except GitHub's API.
       </div>
     </div>
-  </div>
-  <div id="tabs"></div>
-  <div id="scroll"></div>
-</div>
-<div id="statsbar">
-  <div class="stat"><div class="stat-val" id="s-done">0</div><div class="stat-label">Done</div></div>
-  <div class="stat"><div class="stat-val" id="s-hot">0</div><div class="stat-label">Urgent</div></div>
-  <div class="stat"><div class="stat-val" id="s-left">0</div><div class="stat-label">Left</div></div>
-</div>
-<div id="sheet-overlay" onclick="closeSheet()"></div>
-<div id="sheet">
-  <div class="sheet-handle"></div>
-  <div id="sheet-inner"></div>
-</div>
-
-<script>
-// ─── DEFAULT DATA ────────────────────────────────────────────────
-const DEFAULT_TABS = ["Do First","Network","Apply","OPT Clock","Global","Templates"];
-
-const DEFAULT_TASKS = {
-  "Do First":[
-    {id:"d1",group:"",name:"Follow up with Akshara",badge:"hot",sub:"Ask for agency contacts she promised. Aditi Consulting + Caterpillar leads.",tmpl:"followup_akshara"},
-    {id:"d2",group:"",name:"Email DSO — stop OPT clock",badge:"hot",sub:"Ask about stopping the 90-day gap clock. CPT or re-enrollment options.",tmpl:"email_dso"},
-    {id:"d3",group:"",name:"Follow up with Nivedhan",badge:"hot",sub:"Ask if there are Data/AI/ML openings in his company.",tmpl:"followup_person"},
-    {id:"d4",group:"",name:"Build H1b sponsor list",badge:"hot",sub:"Go to myvisajobs.com — filter: Data/ML, 2023–2024, 100+ approvals."},
-    {id:"d5",group:"",name:"Email Prof. Vishal Sachdev",badge:"hot",sub:"Ask for job resources, connections, or TA/RA openings.",tmpl:"email_professor"},
-    {id:"d6",group:"",name:"Email Prof. Ashish Khandelwal",badge:"hot",sub:"Same ask as Sachdev. Akshara suggested both.",tmpl:"email_professor"},
-  ],
-  "Network":[
-    {id:"n1",group:"Warm referrals",name:"Rakshith — Oracle",badge:"warm",sub:"Ask for referral or 2nd/3rd degree connections in Data/AI at Oracle.",tmpl:"linkedin_referral"},
-    {id:"n2",group:"Warm referrals",name:"Nitin — Oracle",badge:"warm",sub:"Same as Rakshith. Oracle sponsors H1b — strong lead.",tmpl:"linkedin_referral"},
-    {id:"n3",group:"Warm referrals",name:"Sridhar — Salesforce",badge:"warm",sub:"Salesforce sponsors H1b. Ask for referral or internal board access.",tmpl:"linkedin_referral"},
-    {id:"n4",group:"Warm referrals",name:"Mounica — Merkle",badge:"warm",sub:"Reach out. Merkle does data/analytics. Ask about open roles.",tmpl:"linkedin_referral"},
-    {id:"n5",group:"Warm referrals",name:"Madhu — Merkle",badge:"warm",sub:"Same as Mounica.",tmpl:"linkedin_referral"},
-    {id:"n6",group:"Warm referrals",name:"Sahil Parwani",badge:"warm",sub:"Look up on LinkedIn. Check his company for Data/AI/ML openings.",tmpl:"linkedin_referral"},
-    {id:"n7",group:"Personal contacts",name:"Text Kavana",badge:"warm",sub:"Sagarika's friend. Worked Chicago, now Florida. Talk to her.",tmpl:"text_kavana"},
-    {id:"n8",group:"Personal contacts",name:"Swathi, Balaji — referrals",badge:"warm",sub:"Ask for referrals or company leads.",tmpl:"linkedin_referral"},
-    {id:"n9",group:"Cold outreach",name:"Email plane contact — Solstice",badge:"act",sub:"Ask if there are Data/AI/ML roles. Be specific about your background.",tmpl:"email_cold_solstice"},
-  ],
-  "Apply":[
-    {id:"a1",group:"Staffing agencies",name:"Get agency contacts from Akshara",badge:"hot",sub:"W2+H1b sponsor model like Aditi Consulting. Ask her to send names/emails."},
-    {id:"a2",group:"Staffing agencies",name:"Reach out to 2–3 staffing agencies",badge:"hot",sub:"Once you have contacts from Akshara, email each agency.",tmpl:"email_agency"},
-    {id:"a3",group:"Retail tech teams",name:"Home Depot — Data/AI roles",badge:"warm",sub:"Apply at careers.homedepot.com. Strong tech team in Atlanta."},
-    {id:"a4",group:"Retail tech teams",name:"Lowe's — data & analytics",badge:"warm",sub:"Lowe's tech hub in Charlotte NC. careers.lowes.com"},
-    {id:"a5",group:"Retail tech teams",name:"Walmart Global Tech",badge:"warm",sub:"careers.walmart.com — filter ML/Data. Strong H1b history."},
-    {id:"a6",group:"Retail tech teams",name:"Target — data science/ML",badge:"warm",sub:"Target tech in Minneapolis. jobs.target.com"},
-    {id:"a7",group:"LinkedIn post",name:"Study RAG chatbot deeply first",badge:"act",sub:"Know every design decision before posting. Architecture, tradeoffs, results."},
-    {id:"a8",group:"LinkedIn post",name:"Post about RAG/AI chatbot on LinkedIn",badge:"act",sub:"Only after item above. Include demo or diagram. Use AI, RAG, LlamaIndex hashtags.",tmpl:"linkedin_post_rag"},
-  ],
-  "OPT Clock":[
-    {id:"o1",group:"Academic route",name:"Email UIUC professors for TA/RA",badge:"hot",sub:"Short email — your skills, Data/AI/ML background, availability.",tmpl:"email_ta_ra"},
-    {id:"o2",group:"Academic route",name:"Talk to DSO / international office",badge:"hot",sub:"Ask specifically about stopping 90-day gap clock. CPT, leave of absence, re-enrollment."},
-  ],
-  "Global":[
-    {id:"g1",group:"Canada — best near-term",name:"Research Canada Express Entry",badge:"act",sub:"Federal Skilled Worker stream. Data/ML qualifies. ~6 months to PR."},
-    {id:"g2",group:"Canada — best near-term",name:"Apply to Canadian Data/AI jobs",badge:"act",sub:"LinkedIn filter: Canada. Shopify, Cohere, RBC, TD, Amazon Canada, Google Waterloo."},
-    {id:"g3",group:"Other countries",name:"Germany — EU Blue Card",badge:"act",sub:"Merit-based, no lottery. PR in 2 years. Berlin/Munich strong ML market."},
-    {id:"g4",group:"Other countries",name:"Singapore — Employment Pass",badge:"act",sub:"GovTech, Sea Group, Grab, ByteDance APAC. Employer sponsors."},
-    {id:"g5",group:"Other countries",name:"UAE / Dubai — no income tax",badge:"act",sub:"G42, Microsoft Gulf, Amazon AWS Dubai. Growing AI sector."},
-  ],
-  "Templates":[]
-};
-
-const DEFAULT_TEMPLATES = {
-  followup_akshara:{title:"Follow-up: Akshara",sub:"WhatsApp or iMessage",body:`Hey Akshara! Hope you're doing well 😊 I wanted to follow up on the agency contacts you mentioned — specifically for staffing firms like Aditi Consulting that do W2 + H1b sponsorship. Whenever you get a chance, could you send those over? Really appreciate your help!`},
-  followup_person:{title:"Follow-up: [Name]",sub:"WhatsApp / iMessage — edit [Name] and [Company]",body:`Hey [Name]! Hope all is well. I wanted to circle back — are there any Data/AI/ML openings at [Company] right now? Even if there's nothing active, I'd love to know who to reach out to internally. Thanks so much!`},
-  linkedin_referral:{title:"LinkedIn referral DM",sub:"Customize [Name] and [Company]",body:`Hi [Name], hope you're doing well! I'm currently exploring Data/AI/ML opportunities and noticed you're at [Company]. I'd love to know if there are any open roles in your team or if you'd be comfortable referring me — [Company] is high on my list. Happy to share my resume if helpful. Thanks!`},
-  text_kavana:{title:"Text to Kavana",sub:"Sagarika's friend — Chicago / Florida",body:`Hey Kavana! This is [Your name] — Sagarika's sibling. Hope you're doing well! I'm currently on OPT and actively job searching in Data/AI/ML. I heard you've had great experience in Chicago and Florida — would love to connect and hear your story. Any advice or leads would mean a lot!`},
-  email_professor:{title:"Email to Professor",sub:"For Sachdev, Khandelwal, or any UIUC prof",body:`Subject: Seeking guidance on Data/AI/ML opportunities — [Your Name], MS [Year]\n\nDear Professor [Last Name],\n\nI hope you're doing well. I am [Your Name], a recent MS graduate from UIUC ([Program]). I am currently on OPT and actively seeking roles in Data Science, AI, and Machine Learning.\n\nI would be truly grateful for any guidance — whether that's potential TA/RA openings in your lab, connections to industry contacts, or any advice on navigating the current job market.\n\nThank you so much for your time. I am happy to share my resume or set up a quick call at your convenience.\n\nBest regards,\n[Your Name]\n[Phone] | [LinkedIn URL]`},
-  email_dso:{title:"Email to DSO / International Office",sub:"To stop OPT 90-day gap clock",body:`Subject: Question about OPT Gap Clock — [Your Name], [UIN]\n\nDear [DSO Name / International Student Office],\n\nI am [Your Name], a recent graduate currently on Post-Completion OPT (expiring [date]). I am actively job searching and want to manage my 90-day unemployment gap carefully.\n\nCould you please advise on any options available to me — such as CPT enrollment, a leave of absence, or any other mechanism that might pause or extend my OPT clock?\n\nThank you for your help.\n\nBest,\n[Your Name]\n[Student ID] | [Email] | [Phone]`},
-  email_agency:{title:"Email to staffing agency",sub:"W2 + H1b sponsor agencies (from Akshara)",body:`Subject: OPT Candidate — Data Science / AI / ML — Available Immediately\n\nHi [Recruiter Name],\n\nMy name is [Your Name] and I was referred to you by [Akshara / contact name]. I am a recent MS graduate from UIUC currently on OPT, actively looking for Data Science, Machine Learning, or AI Engineering roles.\n\nI am open to W2 contract positions with H1b sponsorship. My key skills include Python, SQL, Machine Learning, and I recently built an agentic AI/RAG application using LlamaIndex.\n\nI would love to connect — please find my resume attached.\n\nBest regards,\n[Your Name]\n[Phone] | [LinkedIn]`},
-  email_cold_solstice:{title:"Email to Solstice contact (plane)",sub:"Cold follow-up — warm but specific",body:`Subject: Following up — Data/AI/ML roles at Solstice\n\nHi [Name],\n\nIt was great meeting you on the flight! As I mentioned, I'm a recent UIUC MS grad currently on OPT and exploring Data Science and AI/ML opportunities.\n\nI wanted to reach out and ask — are there any relevant openings at Solstice right now? I'm particularly interested in roles involving ML engineering, data science, or AI product work.\n\nI've attached my resume. Would love to reconnect if you have a few minutes!\n\nBest,\n[Your Name]\n[Phone] | [LinkedIn]`},
-  email_ta_ra:{title:"Email to UIUC professor — TA/RA",sub:"To stop OPT gap clock via enrollment",body:`Subject: TA/RA Opportunity Inquiry — [Your Name], MS [Year]\n\nDear Professor [Last Name],\n\nI hope this finds you well. I'm [Your Name], a recent MS graduate from [Program] at UIUC. I'm reaching out to ask if you have any Teaching Assistant or Research Assistant openings in your lab or courses, particularly in areas touching on Data Science, AI, or Machine Learning.\n\nI am currently on OPT and would greatly benefit from a position that also helps manage my visa timeline.\n\nPlease find my resume attached. I would be happy to discuss further at your convenience.\n\nThank you,\n[Your Name]\n[Phone] | [LinkedIn]`},
-  linkedin_post_rag:{title:"LinkedIn post — RAG chatbot",sub:"Only post when you know it inside out",body:`Just shipped something I'm genuinely proud of.\n\nOver the past [X weeks], I built an end-to-end Agentic RAG (Retrieval-Augmented Generation) chatbot using LlamaIndex — here's what I learned:\n\n[Key design decision 1]\n[Key challenge you solved]\n[Interesting result or metric]\n\nThe hardest part was [honest challenge]. The most surprising thing was [insight].\n\nIf you're building with LLMs and want to talk RAG architecture, agentic pipelines, or LlamaIndex — let's connect.\n\nCurrently open to Data/AI/ML roles. H1b sponsorship welcome.\n\n#AI #RAG #LlamaIndex #MachineLearning #OpenToWork #DataScience`},
-};
-
-// ─── STATE ───────────────────────────────────────────────────────
-let state = {tabs:[], tasks:{}, templates:{}, done:{}};
-let activeTab = "Do First";
-let sheetMode = null; // 'template'|'edit-task'|'add-task'|'edit-template'|'add-template'|'add-tab'|'view-template'
-let editTarget = null;
-
-function initState(){
-  try {
-    const saved = localStorage.getItem('jh_state2');
-    if(saved){ state = JSON.parse(saved); }
-    else { resetToDefault(); }
-  } catch(e){ resetToDefault(); }
-}
-function resetToDefault(){
-  state = {
-    tabs: [...DEFAULT_TABS],
-    tasks: JSON.parse(JSON.stringify(DEFAULT_TASKS)),
-    templates: JSON.parse(JSON.stringify(DEFAULT_TEMPLATES)),
-    done: {}
-  };
-  save();
-}
-function save(){
-  try { localStorage.setItem('jh_state2', JSON.stringify(state)); } catch(e){}
-}
-
-// ─── ID GEN ──────────────────────────────────────────────────────
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
-
-// ─── STATS ───────────────────────────────────────────────────────
-function getAllTasks(){
-  return Object.values(state.tasks).flat().filter(t=>t&&t.id);
-}
-function updateStats(){
-  const all = getAllTasks();
-  const doneCount = all.filter(t=>state.done[t.id]).length;
-  const hotLeft = all.filter(t=>t.badge==='hot'&&!state.done[t.id]).length;
-  const left = all.length - doneCount;
-  document.getElementById('prog-pill').textContent = doneCount+' / '+all.length;
-  document.getElementById('s-done').textContent = doneCount;
-  document.getElementById('s-hot').textContent = hotLeft;
-  document.getElementById('s-left').textContent = left;
-}
-
-// ─── RENDER TABS ─────────────────────────────────────────────────
-function renderTabs(){
-  const wrap = document.getElementById('tabs');
-  wrap.innerHTML = state.tabs.map(t=>
-    `<button class="tab-btn${t===activeTab?' active':''}" onclick="switchTab(${JSON.stringify(t)})">${t}</button>`
-  ).join('');
-}
-
-// ─── RENDER SCROLL ───────────────────────────────────────────────
-function badgeHTML(b){
-  if(!b) return '';
-  const cls={hot:'b-hot',warm:'b-warm',act:'b-act'}[b]||'b-act';
-  const lbl={hot:'do first',warm:'this week',act:'active'}[b]||b;
-  return `<span class="badge ${cls}">${lbl}</span>`;
-}
-function taskHTML(t){
-  const isDone = state.done[t.id];
-  return `<div class="task${isDone?' done':''}" onclick="toggleTask('${t.id}')">
-    <div class="check"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#0a0a0a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="task-content">
-      <div class="task-top"><span class="task-name">${esc(t.name)}</span>${badgeHTML(t.badge)}</div>
-      ${t.sub?`<div class="task-sub">${esc(t.sub)}</div>`:''}
-      <div class="task-actions">
-        ${t.tmpl?`<button class="tmpl-btn" onclick="openViewTemplate(event,'${t.tmpl}')">📋 template</button>`:''}
-        <button class="edit-task-btn" onclick="openEditTask(event,'${t.id}')">✎ edit</button>
-      </div>
-    </div>
-  </div>`;
-}
-function renderScroll(){
-  const wrap = document.getElementById('scroll');
-  if(activeTab==='Templates'){
-    const tmpls = Object.entries(state.templates);
-    wrap.innerHTML = `
-      ${tmpls.map(([key,tmpl])=>`
-        <div class="task" onclick="openViewTemplate(null,'${key}')">
-          <div class="check" style="border-color:transparent;color:var(--accent);font-size:16px;">📋</div>
-          <div class="task-content">
-            <div class="task-top"><span class="task-name">${esc(tmpl.title)}</span></div>
-            <div class="task-sub">${esc(tmpl.sub)}</div>
-            <div class="task-actions">
-              <button class="edit-task-btn" onclick="openEditTemplate(event,'${key}')">✎ edit</button>
-              <button class="edit-task-btn" style="color:var(--red);border-color:rgba(255,90,90,.2)" onclick="deleteTemplate(event,'${key}')">✕ delete</button>
-            </div>
-          </div>
-        </div>`).join('')}
-      <div class="add-task-row" onclick="openAddTemplate()">+ add new template</div>`;
-    return;
-  }
-  const tasks = state.tasks[activeTab]||[];
-  const groups = [];
-  const groupMap = {};
-  tasks.forEach(t=>{
-    const g = t.group||'';
-    if(!groupMap[g]){ groupMap[g]=[]; groups.push(g); }
-    groupMap[g].push(t);
-  });
-  wrap.innerHTML = groups.map(g=>`
-    <div class="group-label">
-      <span>${g||'Tasks'}</span>
-      <button class="tab-add-btn" onclick="openAddTask(${JSON.stringify(g)})">+ add</button>
-    </div>
-    ${groupMap[g].map(taskHTML).join('')}
-  `).join('') + `<div class="add-task-row" onclick="openAddTask('')">+ add task / new section</div>`;
-}
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ─── TOGGLE ──────────────────────────────────────────────────────
-function toggleTask(id){
-  state.done[id] = !state.done[id];
-  save(); renderScroll(); updateStats();
-}
-
-// ─── SWITCH TAB ──────────────────────────────────────────────────
-function switchTab(name){
-  activeTab = name;
-  renderTabs(); renderScroll();
-}
-
-// ─── SHEET HELPERS ───────────────────────────────────────────────
-function openSheet(html){
-  document.getElementById('sheet-inner').innerHTML = html;
-  document.getElementById('sheet-overlay').classList.add('open');
-  document.getElementById('sheet').classList.add('open');
-  setTimeout(()=>{
-    const inp = document.querySelector('#sheet-inner input, #sheet-inner textarea');
-    // don't auto-focus on template view
-    if(inp && sheetMode !== 'view-template') inp.focus();
-  },350);
-}
-function closeSheet(){ 
-  document.getElementById('sheet-overlay').classList.remove('open');
-  document.getElementById('sheet').classList.remove('open');
-}
-
-// ─── VIEW TEMPLATE ───────────────────────────────────────────────
-function openViewTemplate(e, key){
-  if(e) e.stopPropagation();
-  const tmpl = state.templates[key];
-  if(!tmpl) return;
-  sheetMode = 'view-template';
-  editTarget = key;
-  const placeholders = [...new Set((tmpl.body.match(/\[[^\]]+\]/g)||[]))];
-  const fillFields = placeholders.map((p,i)=>
-    `<label class="field-label">${p.replace(/[\[\]]/g,'')}</label>
-     <input class="field-input" id="fill_${i}" placeholder="Type value for ${p}" oninput="updatePreview()">`
-  ).join('');
-  openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">${esc(tmpl.title)}</div><div class="sheet-sub">${esc(tmpl.sub)}</div></div>
-    <div class="sheet-body">
-      ${placeholders.length?`<label class="field-label">Fill in placeholders</label>${fillFields}<label class="field-label" style="margin-top:16px">Preview</label>`:'<label class="field-label">Message</label>'}
-      <textarea class="field-input tmpl-area" id="tmpl_preview" readonly>${esc(tmpl.body)}</textarea>
-      <div class="copy-feedback" id="copy-fb">Copied to clipboard!</div>
-    </div>
     <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="copyPreview()">Copy message</button>
-      <button class="sheet-btn btn-secondary" onclick="closeSheet()">Close</button>
-    </div>`);
-  window._currentTmplBody = tmpl.body;
-  window._currentPlaceholders = placeholders;
-}
-function updatePreview(){
-  let body = window._currentTmplBody;
-  (window._currentPlaceholders||[]).forEach((p,i)=>{
-    const val = document.getElementById('fill_'+i)?.value;
-    if(val) body = body.replaceAll(p, val);
-  });
-  document.getElementById('tmpl_preview').value = body;
-}
-function copyPreview(){
-  const text = document.getElementById('tmpl_preview').value;
-  navigator.clipboard?.writeText(text).catch(()=>{});
-  const ta = document.createElement('textarea');
-  ta.value=text; document.body.appendChild(ta); ta.select();
-  try{document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);
-  const fb = document.getElementById('copy-fb');
-  fb.classList.add('show');
-  setTimeout(()=>fb.classList.remove('show'),2000);
-}
-
-// ─── EDIT TASK ───────────────────────────────────────────────────
-function openEditTask(e, id){
-  if(e) e.stopPropagation();
-  const t = getAllTasks().find(x=>x.id===id);
-  if(!t) return;
-  sheetMode='edit-task'; editTarget=id;
-  const tmplOptions = ['','...none',...Object.keys(state.templates)].map(k=>
-    `<option value="${k}" ${t.tmpl===k?'selected':''}>${k||'— no template —'}</option>`).join('');
-  openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">Edit task</div></div>
-    <div class="sheet-body">
-      <label class="field-label">Task name</label>
-      <input class="field-input" id="e_name" value="${esc(t.name)}">
-      <label class="field-label">Details / sub-text</label>
-      <textarea class="field-input" id="e_sub">${esc(t.sub||'')}</textarea>
-      <label class="field-label">Priority</label>
-      <select class="field-input" id="e_badge">
-        <option value="hot" ${t.badge==='hot'?'selected':''}>🔴 do first (urgent)</option>
-        <option value="warm" ${t.badge==='warm'?'selected':''}>🟡 this week</option>
-        <option value="act" ${t.badge==='act'?'selected':''}>🔵 active</option>
-        <option value="" ${!t.badge?'selected':''}>⚪ none</option>
-      </select>
-      <label class="field-label">Section / group</label>
-      <input class="field-input" id="e_group" value="${esc(t.group||'')}">
-      <label class="field-label">Template (optional)</label>
-      <select class="field-input" id="e_tmpl">${tmplOptions}</select>
-    </div>
-    <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="saveEditTask()">Save</button>
-      <button class="sheet-btn btn-danger" onclick="deleteTask('${id}')">Delete</button>
-    </div>`);
-}
-function saveEditTask(){
-  const tasks = state.tasks[activeTab];
-  const t = tasks.find(x=>x.id===editTarget);
-  if(!t) return;
-  t.name = document.getElementById('e_name').value.trim();
-  t.sub = document.getElementById('e_sub').value.trim();
-  t.badge = document.getElementById('e_badge').value;
-  t.group = document.getElementById('e_group').value.trim();
-  const tmplVal = document.getElementById('e_tmpl').value;
-  t.tmpl = (tmplVal && tmplVal !== '...none') ? tmplVal : undefined;
-  save(); closeSheet(); renderScroll(); updateStats();
-}
-function deleteTask(id){
-  if(!confirm('Delete this task?')) return;
-  state.tasks[activeTab] = (state.tasks[activeTab]||[]).filter(t=>t.id!==id);
-  delete state.done[id];
-  save(); closeSheet(); renderScroll(); updateStats();
-}
-
-// ─── ADD TASK ────────────────────────────────────────────────────
-function openAddTask(group){
-  sheetMode='add-task'; editTarget=group;
-  const tmplOptions = ['','...none',...Object.keys(state.templates)].map(k=>
-    `<option value="${k}">${k||'— no template —'}</option>`).join('');
-  openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">Add task</div><div class="sheet-sub">to ${activeTab}</div></div>
-    <div class="sheet-body">
-      <label class="field-label">Task name</label>
-      <input class="field-input" id="a_name" placeholder="e.g. Email Walmart recruiter">
-      <label class="field-label">Details</label>
-      <textarea class="field-input" id="a_sub" placeholder="Any notes..."></textarea>
-      <label class="field-label">Priority</label>
-      <select class="field-input" id="a_badge">
-        <option value="hot">🔴 do first (urgent)</option>
-        <option value="warm" selected>🟡 this week</option>
-        <option value="act">🔵 active</option>
-        <option value="">⚪ none</option>
-      </select>
-      <label class="field-label">Section / group (leave blank for same group)</label>
-      <input class="field-input" id="a_group" value="${esc(group)}">
-      <label class="field-label">Template (optional)</label>
-      <select class="field-input" id="a_tmpl">${tmplOptions}</select>
-    </div>
-    <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="saveAddTask()">Add task</button>
+      <button class="sheet-btn btn-primary" onclick="saveSettings()">Save & sync</button>
       <button class="sheet-btn btn-secondary" onclick="closeSheet()">Cancel</button>
     </div>`);
 }
-function saveAddTask(){
-  const name = document.getElementById('a_name').value.trim();
-  if(!name) return;
-  const tmplVal = document.getElementById('a_tmpl').value;
-  const t = {
-    id: uid(),
-    group: document.getElementById('a_group').value.trim(),
-    name,
-    badge: document.getElementById('a_badge').value,
-    sub: document.getElementById('a_sub').value.trim(),
-    tmpl: (tmplVal && tmplVal !== '...none') ? tmplVal : undefined
-  };
-  if(!state.tasks[activeTab]) state.tasks[activeTab]=[];
-  state.tasks[activeTab].push(t);
-  save(); closeSheet(); renderScroll(); updateStats();
+async function saveSettings(){
+  ghConfig.owner = document.getElementById('gh_owner').value.trim();
+  ghConfig.repo = document.getElementById('gh_repo').value.trim();
+  ghConfig.token = document.getElementById('gh_token').value.trim();
+  saveGhConfig();
+  closeSheet();
+  const remote = await ghGet();
+  if(remote && remote.tabs){ state=remote; saveLocal(); renderTabs(); renderScroll(); updateStats(); }
+  else { await ghPut(state); }
 }
 
-// ─── ADD TAB ─────────────────────────────────────────────────────
-function openAddTab(){
-  sheetMode='add-tab';
-  openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">New tab</div><div class="sheet-sub">Creates a new section in your tracker</div></div>
-    <div class="sheet-body">
-      <label class="field-label">Tab name</label>
-      <input class="field-input" id="tab_name" placeholder="e.g. Interviews, Follow-ups...">
-    </div>
-    <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="saveAddTab()">Create tab</button>
-      <button class="sheet-btn btn-secondary" onclick="closeSheet()">Cancel</button>
-    </div>`);
-}
-function saveAddTab(){
-  const name = document.getElementById('tab_name').value.trim();
-  if(!name || state.tabs.includes(name)) return;
-  state.tabs.push(name);
-  state.tasks[name] = [];
-  save(); closeSheet(); renderTabs(); switchTab(name);
-}
-
-// ─── TEMPLATES CRUD ──────────────────────────────────────────────
-function openAddTemplate(){
-  sheetMode='add-template';
-  openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">New template</div><div class="sheet-sub">Use [Brackets] for fill-in parts</div></div>
-    <div class="sheet-body">
-      <label class="field-label">Template name</label>
-      <input class="field-input" id="nt_title" placeholder="e.g. LinkedIn cold DM">
-      <label class="field-label">Description</label>
-      <input class="field-input" id="nt_sub" placeholder="e.g. For recruiters at target companies">
-      <label class="field-label">Message body — use [Name], [Company] etc.</label>
-      <textarea class="field-input tmpl-area" id="nt_body" placeholder="Hi [Name], I saw you work at [Company]..."></textarea>
-    </div>
-    <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="saveAddTemplate()">Save template</button>
-      <button class="sheet-btn btn-secondary" onclick="closeSheet()">Cancel</button>
-    </div>`);
-}
-function saveAddTemplate(){
-  const title = document.getElementById('nt_title').value.trim();
-  if(!title) return;
-  const key = 'custom_'+uid();
-  state.templates[key] = {
-    title,
-    sub: document.getElementById('nt_sub').value.trim(),
-    body: document.getElementById('nt_body').value.trim()
-  };
-  save(); closeSheet(); renderScroll();
-}
-function openEditTemplate(e, key){
-  if(e) e.stopPropagation();
-  const tmpl = state.templates[key];
-  if(!tmpl) return;
-  sheetMode='edit-template'; editTarget=key;
-  openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">Edit template</div></div>
-    <div class="sheet-body">
-      <label class="field-label">Name</label>
-      <input class="field-input" id="et_title" value="${esc(tmpl.title)}">
-      <label class="field-label">Description</label>
-      <input class="field-input" id="et_sub" value="${esc(tmpl.sub||'')}">
-      <label class="field-label">Body — use [Name], [Company] etc.</label>
-      <textarea class="field-input tmpl-area" id="et_body">${esc(tmpl.body||'')}</textarea>
-    </div>
-    <div class="sheet-actions">
-      <button class="sheet-btn btn-primary" onclick="saveEditTemplate()">Save</button>
-      <button class="sheet-btn btn-danger" onclick="deleteTemplate(null,'${key}')">Delete</button>
-    </div>`);
-}
-function saveEditTemplate(){
-  state.templates[editTarget] = {
-    title: document.getElementById('et_title').value.trim(),
-    sub: document.getElementById('et_sub').value.trim(),
-    body: document.getElementById('et_body').value.trim()
-  };
-  save(); closeSheet(); renderScroll();
-}
-function deleteTemplate(e, key){
-  if(e) e.stopPropagation();
-  if(!confirm('Delete this template?')) return;
-  delete state.templates[key];
-  save(); closeSheet(); renderScroll();
-}
-
-
-// ─── EXPORT / IMPORT ─────────────────────────────────────────────
-function openExportImport(){
-  const exported = JSON.stringify(state);
-  openSheet(`
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><div class="sheet-title">Sync data</div><div class="sheet-sub">Copy your data to move it to another device</div></div>
-    <div class="sheet-body">
-      <label class="field-label">Your data (copy this, paste on other device)</label>
-      <textarea class="field-input tmpl-area" id="exp_data" style="font-size:10px;min-height:120px;">${exported}</textarea>
-      <div class="copy-feedback" id="exp-fb">Copied!</div>
-      <div style="height:16px;"></div>
-      <label class="field-label">Import from another device — paste data here</label>
-      <textarea class="field-input" id="imp_data" rows="3" placeholder="Paste exported data here..."></textarea>
-    </div>
-    <div class="sheet-actions" style="flex-wrap:wrap;gap:8px;">
-      <button class="sheet-btn btn-primary" onclick="copyExport()">Copy my data</button>
-      <button class="sheet-btn btn-secondary" onclick="doImport()">Import pasted data</button>
-    </div>`);
-}
-function copyExport(){
-  const text = document.getElementById('exp_data').value;
-  navigator.clipboard?.writeText(text).catch(()=>{});
-  const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);
-  const fb=document.getElementById('exp-fb');
-  fb.classList.add('show');
-  setTimeout(()=>fb.classList.remove('show'),2000);
-}
-function doImport(){
-  try {
-    const raw = document.getElementById('imp_data').value.trim();
-    if(!raw) return;
-    const parsed = JSON.parse(raw);
-    if(!parsed.tabs || !parsed.tasks) { alert('Invalid data — make sure you copied it correctly.'); return; }
-    state = parsed;
-    save();
-    closeSheet();
-    renderTabs(); renderScroll(); updateStats();
-    alert('Imported! Your data is now synced.');
-  } catch(e) { alert('Could not import — check the pasted data.'); }
-}
-
-// ─── SWIPE DOWN TO CLOSE SHEET ───────────────────────────────────
-let _sy=0;
-document.getElementById('sheet').addEventListener('touchstart',e=>{_sy=e.touches[0].clientY;});
-document.getElementById('sheet').addEventListener('touchend',e=>{if(e.changedTouches[0].clientY-_sy>80)closeSheet();});
-
-// ─── BOOT ────────────────────────────────────────────────────────
-initState();
-if(!state.tabs||!state.tabs.length) resetToDefault();
-if(!state.tasks) state.tasks={};
-if(!state.templates) state.templates={};
-if(!state.done) state.done={};
-renderTabs(); renderScroll(); updateStats();
+// ─── BOOT ─────────────────────────────────────────────────────────
+(async()=>{
+  await loadData();
+  if(!state.tabs||!state.tabs.length) resetToDefault();
+  renderTabs(); renderScroll(); updateStats();
+})();
 </script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}<\/script>
 </body>
 </html>
