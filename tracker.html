@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pipeline">
+<meta name="theme-color" content="#0a0a0a">
+<title>Job Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--border:#2a2a2a;
+  --accent:#c8f060;--accent-dim:rgba(200,240,96,0.1);--accent-text:#0a0a0a;
+  --text:#f0f0f0;--text2:#888;--text3:#444;
+  --red:#ff5a5a;--amber:#ffb347;--blue:#5ab4ff;--green:#5aff9a;--purple:#c084fc;
+  --radius:14px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;}
+
+/* HEADER */
+#header{padding:52px 20px 0;flex-shrink:0;}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.app-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;}
+.header-actions{display:flex;gap:8px;}
+.icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.icon-btn:active{background:var(--surface2);}
+
+/* FILTER PILLS */
+#filters{display:flex;gap:6px;padding:0 20px 14px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+#filters::-webkit-scrollbar{display:none;}
+.filter-btn{white-space:nowrap;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;transition:all .2s;flex-shrink:0;font-family:'DM Mono',monospace;}
+.filter-btn.active{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:500;}
+
+/* STATS ROW */
+.stats-row{display:flex;gap:8px;padding:0 20px 14px;flex-shrink:0;}
+.stat-chip{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;}
+.stat-chip-val{font-size:18px;font-weight:500;font-family:'DM Mono',monospace;color:var(--accent);}
+.stat-chip-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-top:2px;}
+
+/* SCROLL */
+#scroll{flex:1;overflow-y:auto;padding:0 20px 100px;scrollbar-width:none;}
+#scroll::-webkit-scrollbar{display:none;}
+
+/* JOB CARD */
+.job-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;cursor:pointer;transition:all .15s;position:relative;}
+.job-card:active{transform:scale(.99);background:var(--surface2);}
+.job-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.job-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.3;}
+.company{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.job-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.stage-badge{font-size:10px;padding:3px 9px;border-radius:999px;font-family:'DM Mono',monospace;font-weight:500;}
+.loc-badge{font-size:10px;padding:3px 9px;border-radius:999px;border:1px solid var(--border);color:var(--text3);font-family:'DM Mono',monospace;}
+.followup-badge{font-size:10px;padding:3px 9px;border-radius:999px;font-family:'DM Mono',monospace;}
+.followup-badge.due{background:rgba(255,90,90,.15);color:var(--red);border:1px solid rgba(255,90,90,.3);}
+.followup-badge.soon{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid rgba(255,179,71,.25);}
+.followup-badge.ok{background:rgba(90,180,255,.1);color:var(--blue);border:1px solid rgba(90,180,255,.2);}
+
+/* PIPELINE MINI STEPS */
+.pipeline-steps{display:flex;gap:3px;margin-top:10px;}
+.ps{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .2s;}
+.ps.done{background:var(--accent);}
+.ps.partial{background:var(--amber);}
+
+/* STAGE COLORS */
+.s-found{background:rgba(90,180,255,.12);color:var(--blue);border:1px solid rgba(90,180,255,.2);}
+.s-outreach{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid rgba(255,179,71,.25);}
+.s-applied{background:rgba(200,240,96,.12);color:var(--accent);border:1px solid rgba(200,240,96,.2);}
+.s-interview{background:rgba(192,132,252,.12);color:var(--purple);border:1px solid rgba(192,132,252,.2);}
+.s-offer{background:rgba(90,255,154,.12);color:var(--green);border:1px solid rgba(90,255,154,.2);}
+.s-rejected{background:rgba(255,90,90,.08);color:var(--text3);border:1px solid var(--border);}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-title{font-size:15px;font-weight:500;color:var(--text2);margin-bottom:6px;}
+.empty-sub{font-size:13px;line-height:1.5;}
+
+/* SHEET */
+#sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;}
+#sheet-overlay.open{opacity:1;pointer-events:all;}
+#sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(105%);width:100%;max-width:480px;background:var(--surface);border-radius:24px 24px 0 0;border-top:1px solid var(--border);z-index:101;padding:0 0 40px;transition:transform .3s cubic-bezier(.32,1,.23,1);max-height:95vh;overflow-y:auto;}
+#sheet.open{transform:translateX(-50%) translateY(0);}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.sheet-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);}
+.sheet-title{font-size:16px;font-weight:500;margin-bottom:2px;}
+.sheet-sub{font-size:12px;color:var(--text2);}
+.sheet-body{padding:0 20px;}
+label.fl{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:6px;margin-top:14px;}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;}
+.fi:focus{border-color:var(--accent);}
+select.fi option{background:var(--surface2);}
+textarea.fi{resize:vertical;min-height:70px;font-size:13px;font-family:'DM Mono',monospace;line-height:1.5;}
+.sheet-actions{display:flex;gap:8px;padding:16px 20px 0;}
+.sb{flex:1;padding:13px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;}
+.sb:active{transform:scale(.97);}
+.sb-primary{background:var(--accent);color:var(--accent-text);}
+.sb-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.sb-danger{background:rgba(255,90,90,.15);color:var(--red);border:1px solid rgba(255,90,90,.3);}
+
+/* PIPELINE CHECKLIST IN SHEET */
+.pipeline-check-list{display:flex;flex-direction:column;gap:6px;margin-top:4px;}
+.pc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border-radius:var(--radius-sm);cursor:pointer;border:1px solid var(--border);}
+.pc-item:active{background:var(--border);}
+.pc-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.pc-item.checked .pc-check{background:var(--accent);border-color:var(--accent);}
+.pc-label{font-size:13px;color:var(--text2);}
+.pc-item.checked .pc-label{color:var(--text);text-decoration:line-through;opacity:.6;}
+
+/* ADD BTN FIXED */
+#add-btn{position:fixed;bottom:24px;right:calc(50% - 220px);width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:var(--accent-text);font-size:24px;cursor:pointer;z-index:60;box-shadow:0 4px 20px rgba(200,240,96,.3);display:flex;align-items:center;justify-content:center;}
+@media(max-width:480px){#add-btn{right:20px;}}
+#add-btn:active{transform:scale(.93);}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="header-row">
+      <span class="app-title">Job Pipeline</span>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openSettings()" title="Sync">⚙</button>
+        <a href="index.html" class="icon-btn" title="Back to tasks" style="text-decoration:none;color:var(--text2);">☰</a>
+      </div>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+  </div>
+  <div id="filters"></div>
+  <div id="scroll"><div id="job-list"></div></div>
+</div>
+
+<button id="add-btn" onclick="openAddJob()">+</button>
+<div id="sheet-overlay" onclick="closeSheet()"></div>
+<div id="sheet"><div id="sheet-inner"></div></div>
+
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────────
+const STAGES = [
+  {key:'found',    label:'Found',      cls:'s-found'},
+  {key:'outreach', label:'Outreach',   cls:'s-outreach'},
+  {key:'applied',  label:'Applied',    cls:'s-applied'},
+  {key:'interview',label:'Interview',  cls:'s-interview'},
+  {key:'offer',    label:'Offer',      cls:'s-offer'},
+  {key:'rejected', label:'Rejected',   cls:'s-rejected'},
+];
+const PIPELINE_STEPS = [
+  'H1b check (h1bdata.info)',
+  'Found hiring manager',
+  'DM to hiring manager sent',
+  'HR email found (hunter.io)',
+  'Cold email to HR sent',
+  'Peer coffee chat requested',
+  'Referral asked',
+  'Resume rewritten for this job',
+  'Applied',
+  'Follow-up sent',
+];
+const FILTERS = ['All','Follow-up Due','Outreach','Applied','Interview','Offer'];
+
+// ─── GITHUB CONFIG ────────────────────────────────────────────────
+const GH_FILE = 'pipeline.json';
+let ghConfig = {token:'',owner:'',repo:''};
+let ghSha = null;
+
+function loadGhConfig(){ try{ const c=localStorage.getItem('jh_gh'); if(c) ghConfig=JSON.parse(c); }catch(e){} }
+function saveGhConfig(){ localStorage.setItem('jh_gh',JSON.stringify(ghConfig)); }
+
+async function ghGet(){
+  if(!ghConfig.token) return null;
+  try{
+    const r = await fetch(`https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${GH_FILE}`,{
+      headers:{'Authorization':'token '+ghConfig.token,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(r.status===404) return null;
+    if(!r.ok) return null;
+    const j = await r.json();
+    ghSha = j.sha;
+    return JSON.parse(atob(j.content.replace(/\n/g,'')));
+  }catch(e){ return null; }
+}
+async function ghPut(data){
+  if(!ghConfig.token) return;
+  try{
+    const body={message:'update pipeline',content:btoa(unescape(encodeURIComponent(JSON.stringify(data)))),...(ghSha?{sha:ghSha}:{})};
+    const r = await fetch(`https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${GH_FILE}`,{
+      method:'PUT',headers:{'Authorization':'token '+ghConfig.token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(r.ok){ const j=await r.json(); ghSha=j.content.sha; }
+  }catch(e){}
+}
+
+// ─── STATE ────────────────────────────────────────────────────────
+let jobs = [];
+let activeFilter = 'All';
+let editId = null;
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+
+function saveLocal(){ try{ localStorage.setItem('jh_pipeline', JSON.stringify(jobs)); }catch(e){} }
+function loadLocal(){ try{ const s=localStorage.getItem('jh_pipeline'); if(s){ jobs=JSON.parse(s); return true; } }catch(e){} return false; }
+
+async function save(){ saveLocal(); await ghPut(jobs); }
+
+async function loadData(){
+  loadGhConfig();
+  if(ghConfig.token){
+    const r = await ghGet();
+    if(r){ jobs=r; saveLocal(); return; }
+  }
+  loadLocal();
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const d = new Date(dateStr); const now = new Date();
+  now.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  return Math.round((d-now)/(1000*60*60*24));
+}
+function followupLabel(job){
+  if(!job.followup) return null;
+  const d = daysUntil(job.followup);
+  if(d===null) return null;
+  if(d<0) return {cls:'due',txt:`${Math.abs(d)}d overdue`};
+  if(d===0) return {cls:'due',txt:'follow up today'};
+  if(d<=3) return {cls:'soon',txt:`follow up in ${d}d`};
+  return {cls:'ok',txt:`follow up ${new Date(job.followup).toLocaleDateString('en-US',{month:'short',day:'numeric'})}`};
+}
+function stepsComplete(job){ return (job.steps||[]).filter(Boolean).length; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─── FILTER ───────────────────────────────────────────────────────
+function filteredJobs(){
+  if(activeFilter==='All') return jobs;
+  if(activeFilter==='Follow-up Due') return jobs.filter(j=>{ const f=followupLabel(j); return f&&(f.cls==='due'||f.cls==='soon'); });
+  const stageMap={'Outreach':'outreach','Applied':'applied','Interview':'interview','Offer':'offer'};
+  if(stageMap[activeFilter]) return jobs.filter(j=>j.stage===stageMap[activeFilter]);
+  return jobs;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────
+function renderStats(){
+  const total=jobs.length;
+  const applied=jobs.filter(j=>['applied','interview','offer'].includes(j.stage)).length;
+  const interviews=jobs.filter(j=>j.stage==='interview').length;
+  const due=jobs.filter(j=>{ const f=followupLabel(j); return f&&f.cls==='due'; }).length;
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-chip"><div class="stat-chip-val">${total}</div><div class="stat-chip-label">Total</div></div>
+    <div class="stat-chip"><div class="stat-chip-val">${applied}</div><div class="stat-chip-label">Applied</div></div>
+    <div class="stat-chip"><div class="stat-chip-val">${interviews}</div><div class="stat-chip-label">Interviews</div></div>
+    <div class="stat-chip"><div class="stat-chip-val" style="color:${due?'var(--red)':'var(--accent)'}">${due}</div><div class="stat-chip-label">Follow-up</div></div>`;
+}
+function renderFilters(){
+  document.getElementById('filters').innerHTML = FILTERS.map((f,i)=>
+    `<button class="filter-btn${f===activeFilter?' active':''}" onclick="setFilter(${i})">${f}</button>`
+  ).join('');
+}
+function renderJobs(){
+  const list = filteredJobs();
+  const el = document.getElementById('job-list');
+  if(!list.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No jobs here yet</div><div class="empty-sub">Tap + to add a job you're tracking</div></div>`;
+    return;
+  }
+  // sort: follow-up due first, then by stage order
+  const stageOrder={found:0,outreach:1,applied:2,interview:3,offer:4,rejected:5};
+  const sorted=[...list].sort((a,b)=>{
+    const fa=followupLabel(a), fb=followupLabel(b);
+    if(fa?.cls==='due'&&fb?.cls!=='due') return -1;
+    if(fb?.cls==='due'&&fa?.cls!=='due') return 1;
+    return (stageOrder[a.stage]||0)-(stageOrder[b.stage]||0);
+  });
+  el.innerHTML = sorted.map(job=>{
+    const stage = STAGES.find(s=>s.key===job.stage)||STAGES[0];
+    const fu = followupLabel(job);
+    const done = stepsComplete(job);
+    const stepDots = PIPELINE_STEPS.map((_,i)=>
+      `<div class="ps ${(job.steps||[])[i]?'done':''} "></div>`).join('');
+    return `<div class="job-card" onclick="openJobDetail('${job.id}')">
+      <div class="job-card-top">
+        <div>
+          <div class="job-title">${esc(job.title)}</div>
+          <div class="company">${esc(job.company)}${job.location?' · '+esc(job.location):''}</div>
+        </div>
+      </div>
+      <div class="job-meta">
+        <span class="stage-badge ${stage.cls}">${stage.label}</span>
+        ${job.referral?`<span class="loc-badge" style="color:var(--green);border-color:rgba(90,255,154,.3);">referral</span>`:''}
+        ${fu?`<span class="followup-badge ${fu.cls}">${fu.txt}</span>`:''}
+      </div>
+      <div class="pipeline-steps">${stepDots}</div>
+      <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:6px;">${done}/${PIPELINE_STEPS.length} steps · ${job.date||'no date'}</div>
+    </div>`;
+  }).join('');
+}
+function setFilter(i){ activeFilter=FILTERS[i]; renderFilters(); renderJobs(); }
+function render(){ renderStats(); renderFilters(); renderJobs(); }
+
+// ─── SHEET ────────────────────────────────────────────────────────
+function openSheet(html){
+  document.getElementById('sheet-inner').innerHTML='<div class="sheet-handle"></div>'+html;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+function closeSheet(){
+  document.getElementById('sheet-overlay').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+}
+let _sy=0;
+document.getElementById('sheet').addEventListener('touchstart',e=>{_sy=e.touches[0].clientY;});
+document.getElementById('sheet').addEventListener('touchend',e=>{if(e.changedTouches[0].clientY-_sy>80)closeSheet();});
+
+// ─── ADD JOB ──────────────────────────────────────────────────────
+function openAddJob(){
+  editId=null;
+  openSheet(`
+    <div class="sheet-header"><div class="sheet-title">Add job</div><div class="sheet-sub">Track a new opportunity</div></div>
+    <div class="sheet-body">
+      <label class="fl">Job title</label><input class="fi" id="f_title" placeholder="e.g. Data Analyst II">
+      <label class="fl">Company</label><input class="fi" id="f_company" placeholder="e.g. Walmart Global Tech">
+      <label class="fl">Location</label><input class="fi" id="f_loc" placeholder="e.g. Chicago, IL / Remote">
+      <label class="fl">Stage</label>
+      <select class="fi" id="f_stage">
+        ${STAGES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('')}
+      </select>
+      <label class="fl">H1b sponsorship confirmed?</label>
+      <select class="fi" id="f_h1b">
+        <option value="">Not checked yet</option>
+        <option value="yes">✅ Yes — confirmed on h1bdata.info</option>
+        <option value="no">❌ No — skip this one</option>
+      </select>
+      <label class="fl">Referral available?</label>
+      <select class="fi" id="f_ref">
+        <option value="">No referral</option>
+        <option value="yes">Yes — I have a referral</option>
+        <option value="pending">Pending — asked, waiting</option>
+      </select>
+      <label class="fl">Follow-up date</label><input class="fi" id="f_fu" type="date">
+      <label class="fl">Job URL</label><input class="fi" id="f_url" placeholder="https://...">
+      <label class="fl">Notes</label><textarea class="fi" id="f_notes" placeholder="Hiring manager name, HR email, anything useful..."></textarea>
+    </div>
+    <div class="sheet-actions">
+      <button class="sb sb-primary" onclick="saveJob()">Add job</button>
+      <button class="sb sb-secondary" onclick="closeSheet()">Cancel</button>
+    </div>`);
+}
+
+async function saveJob(){
+  const title=document.getElementById('f_title').value.trim();
+  const company=document.getElementById('f_company').value.trim();
+  if(!title||!company) return;
+  const job={
+    id: editId||uid(),
+    title, company,
+    location:document.getElementById('f_loc').value.trim(),
+    stage:document.getElementById('f_stage').value,
+    h1b:document.getElementById('f_h1b').value,
+    referral:document.getElementById('f_ref').value==='yes',
+    referralPending:document.getElementById('f_ref').value==='pending',
+    followup:document.getElementById('f_fu').value,
+    url:document.getElementById('f_url').value.trim(),
+    notes:document.getElementById('f_notes').value.trim(),
+    date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+    steps: editId ? (jobs.find(j=>j.id===editId)?.steps||[]) : []
+  };
+  if(editId){ const i=jobs.findIndex(j=>j.id===editId); if(i>-1) jobs[i]=job; }
+  else jobs.unshift(job);
+  closeSheet(); render(); await save();
+}
+
+// ─── JOB DETAIL ───────────────────────────────────────────────────
+function openJobDetail(id){
+  const job=jobs.find(j=>j.id===id); if(!job) return;
+  const stage=STAGES.find(s=>s.key===job.stage)||STAGES[0];
+  const fu=followupLabel(job);
+  const steps=job.steps||[];
+  const pipelineHTML=PIPELINE_STEPS.map((step,i)=>`
+    <div class="pc-item${steps[i]?' checked':''}" onclick="toggleStep('${id}',${i})">
+      <div class="pc-check">
+        ${steps[i]?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#0a0a0a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
+      </div>
+      <span class="pc-label">${step}</span>
+    </div>`).join('');
+
+  openSheet(`
+    <div class="sheet-header">
+      <div class="sheet-title">${esc(job.title)}</div>
+      <div class="sheet-sub">${esc(job.company)}${job.location?' · '+esc(job.location):''}</div>
+    </div>
+    <div class="sheet-body">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;">
+        <span class="stage-badge ${stage.cls}">${stage.label}</span>
+        ${job.referral?`<span class="loc-badge" style="color:var(--green);border-color:rgba(90,255,154,.3);">referral ✓</span>`:''}
+        ${job.referralPending?`<span class="loc-badge" style="color:var(--amber);">referral pending</span>`:''}
+        ${job.h1b==='yes'?`<span class="loc-badge" style="color:var(--green);">H1b ✓</span>`:''}
+        ${fu?`<span class="followup-badge ${fu.cls}">${fu.txt}</span>`:''}
+      </div>
+
+      <label class="fl" style="margin-top:16px;">Update stage</label>
+      <select class="fi" id="d_stage" onchange="updateStage('${id}',this.value)">
+        ${STAGES.map(s=>`<option value="${s.key}" ${job.stage===s.key?'selected':''}>${s.label}</option>`).join('')}
+      </select>
+
+      <label class="fl">Set follow-up date</label>
+      <input class="fi" id="d_fu" type="date" value="${job.followup||''}" onchange="updateFollowup('${id}',this.value)">
+
+      <label class="fl">Pipeline checklist (${stepsComplete(job)}/${PIPELINE_STEPS.length} done)</label>
+      <div class="pipeline-check-list">${pipelineHTML}</div>
+
+      ${job.notes?`<label class="fl">Notes</label><div style="font-size:12px;color:var(--text2);line-height:1.6;font-family:'DM Mono',monospace;background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;margin-top:0;">${esc(job.notes)}</div>`:''}
+      ${job.url?`<label class="fl">Job link</label><a href="${esc(job.url)}" target="_blank" style="font-size:12px;color:var(--blue);font-family:'DM Mono',monospace;word-break:break-all;">${esc(job.url)}</a>`:''}
+    </div>
+    <div class="sheet-actions">
+      <button class="sb sb-primary" onclick="openEditJob('${id}')">Edit</button>
+      <button class="sb sb-danger" onclick="deleteJob('${id}')">Delete</button>
+    </div>`);
+}
+
+async function toggleStep(id,i){
+  const job=jobs.find(j=>j.id===id); if(!job) return;
+  if(!job.steps) job.steps=[];
+  job.steps[i]=!job.steps[i];
+  await save();
+  openJobDetail(id); // re-render sheet
+}
+async function updateStage(id,val){
+  const job=jobs.find(j=>j.id===id); if(!job) return;
+  job.stage=val; render(); await save();
+}
+async function updateFollowup(id,val){
+  const job=jobs.find(j=>j.id===id); if(!job) return;
+  job.followup=val; render(); await save();
+}
+function openEditJob(id){
+  editId=id; const job=jobs.find(j=>j.id===id); if(!job) return;
+  closeSheet();
+  setTimeout(()=>{
+    openAddJob();
+    setTimeout(()=>{
+      document.getElementById('f_title').value=job.title||'';
+      document.getElementById('f_company').value=job.company||'';
+      document.getElementById('f_loc').value=job.location||'';
+      document.getElementById('f_stage').value=job.stage||'found';
+      document.getElementById('f_h1b').value=job.h1b||'';
+      document.getElementById('f_ref').value=job.referral?'yes':job.referralPending?'pending':'';
+      document.getElementById('f_fu').value=job.followup||'';
+      document.getElementById('f_url').value=job.url||'';
+      document.getElementById('f_notes').value=job.notes||'';
+      document.querySelector('.sheet-title').textContent='Edit job';
+      document.querySelector('.sb-primary').textContent='Save changes';
+    },50);
+  },300);
+}
+async function deleteJob(id){
+  if(!confirm('Remove this job?')) return;
+  jobs=jobs.filter(j=>j.id!==id);
+  closeSheet(); render(); await save();
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────
+function openSettings(){
+  openSheet(`
+    <div class="sheet-header"><div class="sheet-title">GitHub Sync</div><div class="sheet-sub">Same repo as your job hunt app</div></div>
+    <div class="sheet-body">
+      <label class="fl">GitHub username</label><input class="fi" id="gh_o" value="${esc(ghConfig.owner)}" placeholder="tanusha-mukund">
+      <label class="fl">Repository name</label><input class="fi" id="gh_r" value="${esc(ghConfig.repo)}" placeholder="job-hunt">
+      <label class="fl">Personal Access Token</label><input class="fi" id="gh_t" type="password" value="${esc(ghConfig.token)}" placeholder="ghp_...">
+    </div>
+    <div class="sheet-actions">
+      <button class="sb sb-primary" onclick="saveSettings()">Save & sync</button>
+      <button class="sb sb-secondary" onclick="closeSheet()">Cancel</button>
+    </div>`);
+}
+async function saveSettings(){
+  ghConfig.owner=document.getElementById('gh_o').value.trim();
+  ghConfig.repo=document.getElementById('gh_r').value.trim();
+  ghConfig.token=document.getElementById('gh_t').value.trim();
+  saveGhConfig(); closeSheet();
+  const r=await ghGet();
+  if(r){ jobs=r; saveLocal(); render(); }
+  else await ghPut(jobs);
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────
+(async()=>{ await loadData(); render(); })();
+</script>
+</body>
+</html>
